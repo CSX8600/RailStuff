@@ -1,0 +1,34 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "IRI",
+    " I "  ],
+  "key": {
+    "I":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotIron"
+    },
+    "G":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotGold"
+    },
+    "R":
+    {
+        "type": "forge:ore_dict",
+        "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "railstuff:rolling_stock_assigner",
+    "count": 1
+  },
+  "conditions": [
+    {
+        "type": "minecraft:item_exists",
+        "item": "railstuff:rolling_stock_assigner"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    " W ",
+    " I "  ],
+  "key": {
+    "I":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotIron"
+    },
+    "W":
+    {
+        "item": "minecraft:wool",
+        "data": 11
+    }
+  },
+  "result": {
+    "item": "railstuff:blue_flag",
+    "count": 1
+  }
+}

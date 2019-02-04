@@ -1,0 +1,28 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    " I ",
+    " B "  ],
+  "key": {
+    "I":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotIron"
+    },
+    "W":
+    {
+        "item": "minecraft:wool",
+        "data": 14
+    },
+    "B":
+    {
+        "type": "forge:ore_dict",
+        "ore": "blockIron"
+    }
+  },
+  "result": {
+    "item": "railstuff:manual_switch_stand",
+    "count": 1
+  }
+}

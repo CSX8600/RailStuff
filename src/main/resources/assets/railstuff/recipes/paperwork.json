@@ -1,0 +1,23 @@
+{ 
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+        "type": "forge:ore_dict",
+        "ore": "paper"
+    },
+    {
+        "type": "forge:ore_dict",
+        "ore": "paper"
+    }
+  ],
+  "result": {
+    "item": "railstuff:paperwork",
+    "count": 1
+  },
+  "conditions": [
+    {
+        "type": "minecraft:item_exists",
+        "item": "railstuff:rolling_stock_assigner"
+    }
+  ]
+}

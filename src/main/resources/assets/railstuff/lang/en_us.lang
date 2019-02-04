@@ -1,0 +1,11 @@
+tile.railstuff.manual_switch_stand.name=Manual Switch Stand
+tile.railstuff.red_flag.name=Flag (Red)
+tile.railstuff.yellow_flag.name=Flag (Yellow)
+tile.railstuff.green_flag.name=Flag (Green)
+tile.railstuff.blue_flag.name=Blue Flag
+
+item.railstuff.rolling_stock_assigner.name=Rolling Stock Assigner
+item.railstuff.paperwork.name=Paperwork
+item.railstuff.signal.name=Signal
+
+itemGroup.RailStuff=RailStuff

@@ -1,0 +1,46 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "railstuff:signal_head"
+    },
+    "variants": {
+        "inventory": [{}],
+        "facing": {
+            "north": {},
+            "west": { "y": 270 },
+            "south": { "y": 180 },
+            "east": { "y": 90 }
+        },
+        "aspect":
+        {
+            "green": {
+                "textures": {
+                    "green": "railstuff:blocks/green",
+                    "yellow": "railstuff:blocks/black_textured",
+                    "red": "railstuff:blocks/black_textured"
+                }
+            },
+            "yellow": {
+                "textures": {
+                    "green": "railstuff:blocks/black_textured",
+                    "yellow": "railstuff:blocks/yellow",
+                    "red": "railstuff:blocks/black_textured"
+                }
+            },
+            "red": {
+                "textures": {
+                    "green": "railstuff:blocks/black_textured",
+                    "yellow": "railstuff:blocks/black_textured",
+                    "red": "railstuff:blocks/red_textured"
+                }
+            },
+            "dark": {
+                "textures": {
+                    "green": "railstuff:blocks/black_textured",
+                    "yellow": "railstuff:blocks/black_textured",
+                    "red": "railstuff:blocks/black_textured"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "railstuff:manual_switch_stand"
+    },
+    "variants": {
+        "normal": [{}],
+        "inventory": [{}],
+        "facing":
+        {
+            "north": { "y": 90 },
+            "east": { "y": 180 },
+            "south": { "y": 270 },
+            "west": {}
+        },
+        "state":
+        {
+            "true": {},
+            "false": {}
+        }
+    }
+}
