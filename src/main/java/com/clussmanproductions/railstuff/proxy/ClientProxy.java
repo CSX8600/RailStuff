@@ -71,4 +71,5 @@ public class ClientProxy extends CommonProxy {
 		
 		data.setIdentifierGivenUUID(message.id, message.name);
 	}
+
 }

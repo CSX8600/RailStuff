@@ -1,5 +1,6 @@
 package com.clussmanproductions.railstuff.blocks;
 
+import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.model.BlockFacing;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
@@ -86,8 +87,10 @@ public class BlockMastFake extends BlockFacing implements ITileEntityProvider {
 			return true;
 		}
 		
-		playerIn.openGui(ModRailStuff.instance, GuiProxy.GuiIDs.SIGNAL, worldIn, pos.getX(), pos.getY(), pos.getZ());
-		return true;
+		SignalTileEntity te = (SignalTileEntity)worldIn.getTileEntity(pos);
+		IBlockState masterState = worldIn.getBlockState(te.getMaster(worldIn).getPos());
+		
+		return ModBlocks.mast.onBlockActivated(worldIn, te.getPos(), masterState, playerIn, hand, facing, hitX, hitY, hitZ);
 	}
 	
 	@Override

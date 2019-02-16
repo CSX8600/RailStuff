@@ -7,6 +7,7 @@ import com.clussmanproductions.railstuff.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -21,6 +22,7 @@ public class ModRailStuff
     public static final String MODID = "railstuff";
     public static final String NAME = "RailStuff";
     public static final String VERSION = "0.0.1";
+    public static boolean IR_INSTALLED = false;
     public static CreativeTabs CREATIVE_TAB = new CreativeTabs("RailStuff") {
 		
 		@Override
@@ -54,5 +56,7 @@ public class ModRailStuff
     public void postInit(FMLPostInitializationEvent event)
     {
     	proxy.postInit(event);
+    	
+    	IR_INSTALLED = Loader.isModLoaded("immersiverailroading");
     }
 }

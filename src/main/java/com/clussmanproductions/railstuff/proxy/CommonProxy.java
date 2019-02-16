@@ -1,5 +1,8 @@
 package com.clussmanproductions.railstuff.proxy;
 
+import java.io.File;
+
+import com.clussmanproductions.railstuff.Config;
 import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.BlockBlueFlag;
@@ -10,6 +13,8 @@ import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
+import com.clussmanproductions.railstuff.data.OccupationEndPointData;
+import com.clussmanproductions.railstuff.data.OccupationEndPointData.CleanupTask;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
@@ -21,6 +26,7 @@ import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -33,6 +39,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @EventBusSubscriber
 public class CommonProxy {
+	public static Configuration config;
+	public static OccupationEndPointData.CleanupTask ENDPOINT_DATA_CLEANUP_TASK;
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> e)
 	{
@@ -70,15 +78,23 @@ public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent event)
     {
         PacketHandler.registerMessages("railstuff");
+        
+        File directory = event.getModConfigurationDirectory();
+        config = new Configuration(new File(directory.getPath(), "railstuff.cfg"));
+        Config.readConfig();
     }
 
     public void init(FMLInitializationEvent event)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+		ENDPOINT_DATA_CLEANUP_TASK = new CleanupTask();
     }
     
     public void postInit(FMLPostInitializationEvent event)
     {
-    	
+    	if (config.hasChanged())
+    	{
+    		config.save();
+    	}
     }
 }
