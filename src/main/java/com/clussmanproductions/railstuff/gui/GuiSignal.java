@@ -1,23 +1,20 @@
 package com.clussmanproductions.railstuff.gui;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import com.clussmanproductions.railstuff.ModRailStuff;
-import com.clussmanproductions.railstuff.gui.GuiSignalEndPointList.EndPointElement;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity.Aspect;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity.Mode;
-import com.clussmanproductions.railstuff.tile.SignalTileEntity.OccupationModeState;
-import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import scala.actors.threadpool.Arrays;
 
 public class GuiSignal extends GuiScreen {
 	private SignalTileEntity signal;
@@ -42,7 +39,9 @@ public class GuiSignal extends GuiScreen {
 	ResourceLocation background = new ResourceLocation(ModRailStuff.MODID, "textures/gui/signalBack.png");
 	
 	// Occupation options
-	GuiSignalEndPointList list;
+	GuiTextField status;
+	String strStatus;
+	int statusColor;
 	
 	SignalTileEntity.Mode lastMode;
 	
@@ -94,12 +93,11 @@ public class GuiSignal extends GuiScreen {
 		poweredGreen = new GuiButtonTextured(ComponentIDs.POWERED_GREEN, horizontalCenter + (unpoweredTextWidth / 2 + 10) + 52, verticalLower, 16, 16, green, false, "");
 		
 		// Occupation setup
-		int listLeft = horizontalCenter - (texWidth / 2) + 20;
-		int listTop = verticalCenter - (texHeight / 2) + 30;
-		int listRight = listLeft + texWidth - 40;
-		int listBottom = listTop + 140;
-		list = new GuiSignalEndPointList(mc, listRight - listLeft, listBottom - listTop, listTop, listBottom, listLeft, 20, listRight - listLeft, listBottom - listTop);
-		fillEndpointList();
+		int fontWidth = fontRenderer.getStringWidth("Status:");
+		int statusLeft = horizontalCenter - (texWidth / 2) + fontWidth + 20;
+		status = new GuiTextField(ComponentIDs.STATUS, fontRenderer, statusLeft, verticalCenter - 10, texWidth - fontWidth - 40, 20);
+		status.setText(signal.getSignalStatus());
+		status.setTextColor(signal.getSignalStatusColor());
 		
 		updateButtonVisibility();
 		
@@ -130,17 +128,7 @@ public class GuiSignal extends GuiScreen {
 		buttonList.addAll(buttons);
 		
 		lastMode = signal.getMode();
-	}
-	
-	private void fillEndpointList() {
-		ImmutableMap<BlockPos, String> endpoints = signal.getRegisteredEndPoints();
-		for(BlockPos pos : endpoints.keySet())
-		{
-			String name = endpoints.get(pos);
-			name += " [" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + "]";
-			
-			list.add(new EndPointElement(name));
-		}
+		
 	}
 
 	@Override
@@ -173,13 +161,9 @@ public class GuiSignal extends GuiScreen {
 				drawString(fontRenderer, "Powered aspect:", horizontalCenter - (stringWidth / 2 - 10) - 88, verticalLower + 5, colorWhite);
 				break;
 			case Occupation:
-				if (signal.getRegisteredEndPoints().size() != list.getSize())
-				{
-					list.clear();
-					fillEndpointList();
-				}
-				
-				list.drawScreen(mouseX, mouseY, partialTicks);
+				stringWidth = fontRenderer.getStringWidth("Status:");
+				drawString(fontRenderer, "Status:", horizontalCenter - (texWidth / 2) + 10, verticalCenter - 5, colorWhite);
+				status.drawTextBox();
 				break;
 		}
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -199,6 +183,7 @@ public class GuiSignal extends GuiScreen {
 		poweredYellow.visible = false;
 		poweredYellowFlash.visible = false;
 		poweredGreen.visible = false;
+		status.setVisible(false);
 		
 		switch(signal.getMode())
 		{
@@ -215,6 +200,9 @@ public class GuiSignal extends GuiScreen {
 				poweredYellow.visible = true;
 				poweredYellowFlash.visible = true;
 				poweredGreen.visible = true;
+				break;
+			case Occupation:
+				status.setVisible(true);
 				break;
 		}
 	}
@@ -340,7 +328,6 @@ public class GuiSignal extends GuiScreen {
 					break;
 				case ComponentIDs.MODE_OCCUPATION:
 					signal.setMode(Mode.Occupation);
-					signal.setOccupationModeState(OccupationModeState.Initialization);
 					break;
 			}
 		}
@@ -420,5 +407,6 @@ public class GuiSignal extends GuiScreen {
 		public static final int POWERED_YELLOW_FLASH = 12;
 		public static final int POWERED_GREEN = 13;
 		public static final int MODE_OCCUPATION = 14;
+		public static final int STATUS = 15;
 	}
 }

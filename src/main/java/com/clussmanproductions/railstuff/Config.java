@@ -11,7 +11,6 @@ public class Config {
 	
 	public static int signalDistanceTimeout = 2000;
 	public static int signalDistanceTick = 10;
-	public static int occupationBlockCleanupTask = 5;
 	
 	public static void readConfig()
 	{
@@ -39,6 +38,5 @@ public class Config {
 		cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General configuration");
 		signalDistanceTimeout = cfg.getInt("signalDistanceTimeout", CATEGORY_GENERAL, signalDistanceTimeout, 1, 5000, "How far (in blocks) should signals test for the next signal?");
 		signalDistanceTick = cfg.getInt("signalDistanceTick", CATEGORY_GENERAL, signalDistanceTick, 1, 500, "How far (in blocks) should a signal test for the next signal per tick?");
-		occupationBlockCleanupTask = cfg.getInt("occupationBlockCleanupTask", CATEGORY_GENERAL, 5, 1, Integer.MAX_VALUE, "How often should the Occupation End Point Data Cleanup Task run (in minutes)?");
 	}
 }

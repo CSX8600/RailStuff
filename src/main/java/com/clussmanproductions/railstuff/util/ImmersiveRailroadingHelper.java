@@ -1,8 +1,12 @@
 package com.clussmanproductions.railstuff.util;
 
+import java.util.List;
+
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 
 import cam72cam.immersiverailroading.blocks.BlockRailBase;
+import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.library.SwitchState;
 import cam72cam.immersiverailroading.library.TrackItems;
 import cam72cam.immersiverailroading.tile.TileRail;
@@ -12,14 +16,15 @@ import cam72cam.immersiverailroading.track.BuilderSwitch;
 import cam72cam.immersiverailroading.util.SwitchUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ImmersiveRailroadingHelper {
-	public static BlockPos findOrigin(BlockPos currentPos, EnumFacing signalFacing, World world)
+	public static Vec3d findOrigin(BlockPos currentPos, EnumFacing signalFacing, World world)
 	{
-		BlockPos retVal = new BlockPos(0, -1, 0);
+		Vec3d retVal = new Vec3d(0, -1, 0);
 		
 		EnumFacing searchDirection = signalFacing.rotateY().rotateY().rotateY();
 		
@@ -40,7 +45,7 @@ public class ImmersiveRailroadingHelper {
 				
 				Vec3d center = tile.getNextPosition(current, new Vec3d(0, 0, 0));
 				
-				retVal = new BlockPos(center.x, center.y, center.z);
+				retVal = new Vec3d(center.x, center.y, center.z);
 				break;
 			}
 		}
@@ -52,7 +57,64 @@ public class ImmersiveRailroadingHelper {
 	{
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
 		TileEntity te = world.getTileEntity(currentBlockPos);
-		if (te == null || !(te instanceof TileRailBase))
+//		if (te == null || !(te instanceof TileRailBase))
+//		{
+//			// Maybe slope, so look above and below
+//			currentBlockPos = currentBlockPos.up();
+//			te = world.getTileEntity(currentBlockPos);
+//			
+//			if (te == null || !(te instanceof TileRailBase))
+//			{
+//				currentBlockPos = currentBlockPos.down(2);
+//				te = world.getTileEntity(currentBlockPos);
+//				
+//				if (te == null || !(te instanceof TileRailBase))
+//				{
+// 					return currentPosition;
+//				}
+//			}
+//		}
+		
+		int attempt = 0;
+		while(te == null && attempt < 8)
+		{
+			switch(attempt)
+			{
+				case 0:
+					currentBlockPos = currentBlockPos.up();
+					break;
+				case 1:
+					currentBlockPos = currentBlockPos.down(2);
+					break;
+				case 2:
+					currentBlockPos = currentBlockPos.up();
+					EnumFacing direction = EnumFacing.getFacingFromVector((float)motion.x, (float)motion.y, (float)motion.z).rotateY();
+					currentBlockPos = currentBlockPos.offset(direction);
+					break;
+				case 3:
+					direction = EnumFacing.getFacingFromVector((float)motion.x, (float)motion.y, (float)motion.z).rotateY().rotateY().rotateY();
+					currentBlockPos = currentBlockPos.offset(direction, 2);
+					break;
+				case 4:
+					currentBlockPos = currentBlockPos.up();
+					break;
+				case 5:
+					currentBlockPos = currentBlockPos.down(2);
+					break;
+				case 6:
+					direction = EnumFacing.getFacingFromVector((float)motion.x, (float)motion.y, (float)motion.z).rotateY();
+					currentBlockPos = currentBlockPos.offset(direction, 2);
+					break;
+				case 7:
+					currentBlockPos = currentBlockPos.up(2);
+					break;
+			}
+			
+			te = world.getTileEntity(currentBlockPos);
+			attempt++;
+		}
+		
+		if (te == null)
 		{
 			return currentPosition;
 		}
@@ -113,14 +175,20 @@ public class ImmersiveRailroadingHelper {
 	public static boolean hasStockNearby(Vec3d currentPosition, World world)
 	{
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
-		TileEntity te = world.getTileEntity(currentBlockPos);
-		if (te == null || !(te instanceof TileRailBase))
-		{
-			return false;
-		}
+//		TileEntity te = world.getTileEntity(currentBlockPos);
+//		if (te == null || !(te instanceof TileRailBase))
+//		{
+//			ModRailStuff.logger.info("Could not find rail");
+//			return false;
+//		}
+//		
+//		TileRailBase rail = (TileRailBase)te;
+//		return rail.getStockNearBy(null) != null;
 		
-		TileRailBase rail = (TileRailBase)te;
-		return rail.getStockNearBy(null) != null;
+		AxisAlignedBB bb = new AxisAlignedBB(currentBlockPos.south().west(), currentBlockPos.up(3).east().north());
+		List<EntityMoveableRollingStock> stocks = world.getEntitiesWithinAABB(EntityMoveableRollingStock.class, bb);
+		
+		return !stocks.isEmpty();
 	}
 
 	public static boolean blockPosIsRail(BlockPos pos, World world)

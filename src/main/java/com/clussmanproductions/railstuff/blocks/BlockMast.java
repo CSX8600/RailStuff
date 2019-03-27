@@ -5,6 +5,7 @@ import java.util.Random;
 import com.clussmanproductions.railstuff.ModItems;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
+import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 
 import net.minecraft.block.Block;
@@ -18,8 +19,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumFacing.Plane;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -110,8 +111,14 @@ public class BlockMast extends Block implements ITileEntityProvider {
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!worldIn.isRemote)		{
-			return true;
+		if (!worldIn.isRemote)		
+		{
+			return !(playerIn.inventory.getCurrentItem().getItem() instanceof ItemSignalSurveyor);
+		}
+		
+		if (playerIn.inventory.getCurrentItem().getItem() instanceof ItemSignalSurveyor)
+		{
+			return false;
 		}
 		
 		playerIn.openGui(ModRailStuff.instance, GuiProxy.GuiIDs.SIGNAL, worldIn, pos.getX(), pos.getY(), pos.getZ());
