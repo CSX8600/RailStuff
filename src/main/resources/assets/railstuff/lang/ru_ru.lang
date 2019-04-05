@@ -1,0 +1,11 @@
+tile.railstuff.manual_switch_stand.name=Стрелочный перевод
+tile.railstuff.red_flag.name=Красный флаг
+tile.railstuff.yellow_flag.name=Желтый флаг
+tile.railstuff.green_flag.name=Зеленый флаг
+tile.railstuff.blue_flag.name=Синий флаг
+
+item.railstuff.rolling_stock_assigner.name=Индетификационный сканер
+item.railstuff.paperwork.name=Индетификатор
+item.railstuff.signal.name=Семафор
+
+itemGroup.RailStuff=Дополнения к Immersive Railroading
