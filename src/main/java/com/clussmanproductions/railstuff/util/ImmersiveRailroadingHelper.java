@@ -28,26 +28,31 @@ public class ImmersiveRailroadingHelper {
 		
 		EnumFacing searchDirection = signalFacing.rotateY().rotateY().rotateY();
 		
-		BlockPos workingPos = new BlockPos(currentPos.getX(), currentPos.getY(), currentPos.getZ());
-		for(int i = 0; i <= 10; i++)
+		BlockPos workingPos = new BlockPos(currentPos.getX(), currentPos.getY() - 3, currentPos.getZ());
+		for(int y = 0; y < 6; y++)
 		{
-			workingPos = workingPos.offset(searchDirection);
-			
-			if (world.getBlockState(workingPos).getBlock() instanceof BlockRailBase)
+			for(int i = 0; i <= 10; i++)
 			{
-				TileRailBase tile = (TileRailBase)world.getTileEntity(workingPos);
-				if (tile == null)
+				workingPos = workingPos.offset(searchDirection);
+				
+				if (world.getBlockState(workingPos).getBlock() instanceof BlockRailBase)
 				{
-					continue;
+					TileRailBase tile = (TileRailBase)world.getTileEntity(workingPos);
+					if (tile == null)
+					{
+						continue;
+					}
+					
+					Vec3d current = new Vec3d(workingPos.getX(), workingPos.getY(), workingPos.getZ());
+					
+					Vec3d center = tile.getNextPosition(current, new Vec3d(0, 0, 0));
+					
+					retVal = new Vec3d(center.x, center.y, center.z);
+					break;
 				}
-				
-				Vec3d current = new Vec3d(workingPos.getX(), workingPos.getY(), workingPos.getZ());
-				
-				Vec3d center = tile.getNextPosition(current, new Vec3d(0, 0, 0));
-				
-				retVal = new Vec3d(center.x, center.y, center.z);
-				break;
 			}
+			
+			workingPos = new BlockPos(currentPos.getX(), workingPos.getY() + 1, currentPos.getZ());
 		}
 		
 		return retVal;
@@ -57,23 +62,6 @@ public class ImmersiveRailroadingHelper {
 	{
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
 		TileEntity te = world.getTileEntity(currentBlockPos);
-//		if (te == null || !(te instanceof TileRailBase))
-//		{
-//			// Maybe slope, so look above and below
-//			currentBlockPos = currentBlockPos.up();
-//			te = world.getTileEntity(currentBlockPos);
-//			
-//			if (te == null || !(te instanceof TileRailBase))
-//			{
-//				currentBlockPos = currentBlockPos.down(2);
-//				te = world.getTileEntity(currentBlockPos);
-//				
-//				if (te == null || !(te instanceof TileRailBase))
-//				{
-// 					return currentPosition;
-//				}
-//			}
-//		}
 		
 		int attempt = 0;
 		while(te == null && attempt < 8)
