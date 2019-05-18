@@ -13,6 +13,7 @@ import cam72cam.immersiverailroading.tile.TileRail;
 import cam72cam.immersiverailroading.tile.TileRailBase;
 import cam72cam.immersiverailroading.tile.TileRailGag;
 import cam72cam.immersiverailroading.track.BuilderSwitch;
+import cam72cam.immersiverailroading.track.IIterableTrack;
 import cam72cam.immersiverailroading.util.SwitchUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -137,8 +138,9 @@ public class ImmersiveRailroadingHelper {
 				else
 				{
 					// We are on the trailing point of the switch...we need to make sure we're lined
-					BuilderSwitch builder = (BuilderSwitch)railParent.info.getBuilder();
-					boolean isOnStraight = builder.isOnStraight(currentPosition);
+					IIterableTrack switchBuilder = (IIterableTrack)railParent.info.getBuilder();
+					
+					boolean isOnStraight = switchBuilder.isOnTrack(railParent.info, currentPosition);
 					SwitchState switchState = SwitchUtil.getSwitchState(rail);
 					
 					if ((isOnStraight && switchState == SwitchState.TURN) ||
