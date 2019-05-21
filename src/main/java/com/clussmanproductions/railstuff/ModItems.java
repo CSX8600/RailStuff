@@ -3,7 +3,6 @@ package com.clussmanproductions.railstuff;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.item.ItemSignal;
-import com.clussmanproductions.railstuff.item.ItemSignalDouble;
 import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 
 import net.minecraftforge.fml.common.Loader;
@@ -17,8 +16,6 @@ public class ModItems {
 	public static ItemPaperwork paperwork;
 	@ObjectHolder("signal")
 	public static ItemSignal signal;
-	@ObjectHolder("signal_double")
-	public static ItemSignalDouble signal_double;
 	@ObjectHolder("signal_surveyor")
 	public static ItemSignalSurveyor signal_surveyor;
 	

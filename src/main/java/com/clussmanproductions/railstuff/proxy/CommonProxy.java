@@ -18,7 +18,6 @@ import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.item.ItemSignal;
-import com.clussmanproductions.railstuff.item.ItemSignalDouble;
 import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
@@ -52,7 +51,6 @@ public class CommonProxy {
 		}
 		
 		e.getRegistry().register(new ItemSignal());
-		e.getRegistry().register(new ItemSignalDouble());
 		
 		e.getRegistry().register(new ItemBlock(ModBlocks.manual_switch_stand).setRegistryName(ModBlocks.manual_switch_stand.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.red_flag).setRegistryName(ModBlocks.red_flag.getRegistryName()));
