@@ -5,8 +5,8 @@ import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
 import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
-import com.clussmanproductions.railstuff.blocks.BlockSignalHead.Aspect;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.clussmanproductions.railstuff.util.EnumAspect;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -74,7 +74,7 @@ public class ItemSignalDouble extends Item {
 		IBlockState oldSecondary = worldIn.getBlockState(basePos);
 		IBlockState newStateSecondary = ModBlocks.signal_head.getDefaultState()
 				.withProperty(BlockSignalHead.FACING, player.getHorizontalFacing())
-				.withProperty(BlockSignalHead.ASPECT, Aspect.Dark);
+				.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 		worldIn.setBlockState(basePos, newStateSecondary);
 		
 		SignalTileEntity signalHeadTESecondary = (SignalTileEntity)worldIn.getTileEntity(basePos);
@@ -99,7 +99,7 @@ public class ItemSignalDouble extends Item {
 		IBlockState old = worldIn.getBlockState(basePos);
 		IBlockState newState = ModBlocks.signal_head.getDefaultState()
 				.withProperty(BlockSignalHead.FACING, player.getHorizontalFacing())
-				.withProperty(BlockSignalHead.ASPECT, Aspect.Dark);
+				.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 		worldIn.setBlockState(basePos, newState);
 		
 		SignalTileEntity signalHeadTE = (SignalTileEntity)worldIn.getTileEntity(basePos);

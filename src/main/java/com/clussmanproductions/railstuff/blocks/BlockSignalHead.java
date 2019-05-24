@@ -6,6 +6,7 @@ import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.model.BlockFacing;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.clussmanproductions.railstuff.util.EnumAspect;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -26,7 +27,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockSignalHead extends BlockFacing implements ITileEntityProvider {
-	public static PropertyEnum<Aspect> ASPECT = PropertyEnum.create("aspect", Aspect.class);
+	public static PropertyEnum<EnumAspect> ASPECT = PropertyEnum.create("aspect", EnumAspect.class);
 	
 	public BlockSignalHead()
 	{
@@ -93,39 +94,7 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 		}
 	}
 
-	public enum Aspect implements IStringSerializable
-	{
-		Red("red", 1),
-		Yellow("yellow", 2),
-		Green("green", 3),
-		Dark("dark", 4); 
-		
-		private String name;
-		private int index;
-		Aspect(String name, int index)
-		{
-			this.name = name;
-			this.index = index;
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-		
-		public Aspect getAspect(int index)
-		{
-			for(Aspect aspect : Aspect.values())
-			{
-				if (aspect.index == index)
-				{
-					return aspect;
-				}
-			}
-			
-			return null;
-		}
-	}
+	
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
@@ -159,20 +128,20 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 			workingMeta -= 4;
 		};
 		
-		Aspect aspect;
+		EnumAspect aspect;
 		switch(iterationTimes)
 		{
 			case 3:
-				aspect = Aspect.Red;
+				aspect = EnumAspect.Red;
 				break;
 			case 2:
-				aspect = Aspect.Yellow;
+				aspect = EnumAspect.Yellow;
 				break;
 			case 1:
-				aspect = Aspect.Green;
+				aspect = EnumAspect.Green;
 				break;
 			default:
-				aspect = Aspect.Dark;
+				aspect = EnumAspect.Dark;
 				break;
 		}
 		
@@ -192,7 +161,7 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 	
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-		if (state.getValue(ASPECT) == Aspect.Dark)
+		if (state.getValue(ASPECT) == EnumAspect.Dark)
 		{
 			return 0;
 		}

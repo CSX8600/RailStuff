@@ -6,6 +6,7 @@ import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
 import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.util.EnumAspect;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
 import net.minecraft.block.Block;
@@ -459,21 +460,21 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		if (!hasUpdatedBlockState && mode == Mode.Manual)
 		{
 			boolean powered = world.isBlockPowered(getPos());
-			BlockSignalHead.Aspect blockAspect = BlockSignalHead.Aspect.Dark;
+			EnumAspect blockAspect = EnumAspect.Dark;
 			if (powered)
 			{
 				switch(poweredAspect)
 				{
 					case Green:
-						blockAspect = BlockSignalHead.Aspect.Green;
+						blockAspect = EnumAspect.Green;
 						break;
 					case Yellow:
 					case YellowFlashing:
-						blockAspect = BlockSignalHead.Aspect.Yellow;
+						blockAspect = EnumAspect.Yellow;
 						break;
 					case Red:
 					case RedFlashing:
-						blockAspect = BlockSignalHead.Aspect.Red;
+						blockAspect = EnumAspect.Red;
 						break;
 				}
 			}
@@ -482,15 +483,15 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 				switch(unpoweredAspect)
 				{
 					case Green:
-						blockAspect = BlockSignalHead.Aspect.Green;
+						blockAspect = EnumAspect.Green;
 						break;
 					case Yellow:
 					case YellowFlashing:
-						blockAspect = BlockSignalHead.Aspect.Yellow;
+						blockAspect = EnumAspect.Yellow;
 						break;
 					case Red:
 					case RedFlashing:
-						blockAspect = BlockSignalHead.Aspect.Red;
+						blockAspect = EnumAspect.Red;
 						break;
 				}
 			}
@@ -548,23 +549,23 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (poweredAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 
 				world.setBlockState(getSignalHeadPos(), state);
@@ -588,23 +589,23 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (unpoweredAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 				
 				world.setBlockState(getSignalHeadPos(), state);
@@ -630,23 +631,23 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (occupationAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 				
 				world.setBlockState(getSignalHeadPos(), state);
@@ -655,18 +656,18 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			}
 			else
 			{
-				BlockSignalHead.Aspect newAspect = BlockSignalHead.Aspect.Dark;
+				EnumAspect newAspect = EnumAspect.Dark;
 				
 				switch(occupationAspect)
 				{
 					case Red:
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 						break;
 					case Yellow:
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 						break;
 					case Green:
-						newAspect = BlockSignalHead.Aspect.Green;
+						newAspect = EnumAspect.Green;
 						break;
 				}
 				
@@ -874,19 +875,19 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			return;
 		}
 		
-		BlockSignalHead.Aspect aspect = BlockSignalHead.Aspect.Dark;
+		EnumAspect aspect = EnumAspect.Dark;
 		if (powered)
 		{
 			switch(poweredAspect)
 			{
 				case Red:
-					aspect = BlockSignalHead.Aspect.Red;
+					aspect = EnumAspect.Red;
 					break;
 				case Yellow:
-					aspect = BlockSignalHead.Aspect.Yellow;
+					aspect = EnumAspect.Yellow;
 					break;
 				case Green:
-					aspect = BlockSignalHead.Aspect.Green;
+					aspect = EnumAspect.Green;
 					break;
 			}
 		}
@@ -895,13 +896,13 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			switch(unpoweredAspect)
 			{
 				case Red:
-					aspect = BlockSignalHead.Aspect.Red;
+					aspect = EnumAspect.Red;
 					break;
 				case Yellow:
-					aspect = BlockSignalHead.Aspect.Yellow;
+					aspect = EnumAspect.Yellow;
 					break;
 				case Green:
-					aspect = BlockSignalHead.Aspect.Green;
+					aspect = EnumAspect.Green;
 					break;
 			}
 		}
