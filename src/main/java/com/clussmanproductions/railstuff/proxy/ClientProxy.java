@@ -1,9 +1,14 @@
 package com.clussmanproductions.railstuff.proxy;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
+import cam72cam.immersiverailroading.thirdparty.CommonAPI;
 import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModItems;
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.model.ModelLoader;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.gui.GuiAssignRollingStock;
@@ -24,7 +29,9 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.Level;
 
 @EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
@@ -45,31 +52,33 @@ public class ClientProxy extends CommonProxy {
 	public static void handleSetIdentifierForAssignGUI(PacketSetIdentifierForAssignGUI message)
 	{
 		World world = Minecraft.getMinecraft().world;
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-		data.setIdentifierGivenUUID(message.id, message.name);
+		EntityRollingStock stock = world.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(message.id);}).get(0);
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(player, new AxisAlignedBB(message.x-1, message.y-1, message.z-1, message.x+1, message.y+1, message.z+1));
 		if (entities.size() > 0)
 		{
 			GuiAssignRollingStock gui = new GuiAssignRollingStock(message.id);
 			Minecraft.getMinecraft().displayGuiScreen(gui);
-			gui.setText(message.name);
+			gui.setText(stock.tag);
 		}
 	}
 	
 	public static void handleSetAllIdentifiersForClient(PacketSetAllIdentifiersForClient message)
 	{
 		World world = Minecraft.getMinecraft().world;
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-		data.setData(message.values);
+		for(UUID id : message.values.keySet()) {
+			String name = message.values.get(id);
+
+			EntityRollingStock stock = world.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(id);}).get(0);
+			stock.tag = name;
+		}
 	}
 	
 	public static void handleSetIdentifierForClient(PacketSetIdentifierForClient message)
 	{
 		World world = Minecraft.getMinecraft().world;
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-		
-		data.setIdentifierGivenUUID(message.id, message.name);
+		EntityRollingStock stock = world.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(message.id);}).get(0);
+		stock.tag = message.name;
 	}
 
 }

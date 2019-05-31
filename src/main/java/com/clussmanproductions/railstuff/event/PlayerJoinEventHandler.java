@@ -29,11 +29,5 @@ public class PlayerJoinEventHandler {
 		
 		EntityPlayerMP player = (EntityPlayerMP)entity;
 		World world = e.getWorld();
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-		
-		PacketSetAllIdentifiersForClient packet = new PacketSetAllIdentifiersForClient();
-		packet.values = data.getData();
-		
-		PacketHandler.INSTANCE.sendTo(packet, player);
 	}
 }

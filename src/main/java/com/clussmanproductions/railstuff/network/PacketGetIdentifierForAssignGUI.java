@@ -2,6 +2,8 @@ package com.clussmanproductions.railstuff.network;
 
 import java.util.UUID;
 
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
+import cam72cam.immersiverailroading.thirdparty.CommonAPI;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 
 import io.netty.buffer.ByteBuf;
@@ -50,13 +52,12 @@ public class PacketGetIdentifierForAssignGUI implements IMessage {
 		private void handle(PacketGetIdentifierForAssignGUI message, MessageContext ctx)
 		{
 			World world = ctx.getServerHandler().player.world;
-			RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-			
-			String name = data.getIdentifierByUUID(message.id);
+			EntityRollingStock stock = world.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(message.id);}).get(0);
+			String apiTag = stock.tag;
 			
 			PacketSetIdentifierForAssignGUI packet = new PacketSetIdentifierForAssignGUI();
 			packet.id = message.id;
-			packet.name = name;
+			packet.name = apiTag;
 			packet.x = message.x;
 			packet.y = message.y;
 			packet.z = message.z;

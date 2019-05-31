@@ -1,5 +1,8 @@
 package com.clussmanproductions.railstuff.event;
 
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
+import cam72cam.immersiverailroading.thirdparty.CommonAPI;
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketHandler;
@@ -11,6 +14,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.Level;
 
 @EventBusSubscriber(Side.SERVER)
 public class PlayerInteractServerEventHandler {
@@ -40,13 +44,13 @@ public class PlayerInteractServerEventHandler {
 		int x = (int)Math.floor(entity.posX);
 		int y = (int)Math.floor(entity.posY);
 		int z = (int)Math.floor(entity.posZ);
-		
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(e.getWorld());
-		String name = data.getIdentifierByUUID(e.getTarget().getPersistentID());
-		
+
+		EntityRollingStock stock = (EntityRollingStock) e.getTarget();
+		String apiTag = stock.tag;
+
 		PacketSetIdentifierForAssignGUI packet = new PacketSetIdentifierForAssignGUI();
 		packet.id = e.getTarget().getPersistentID();
-		packet.name = name;
+		packet.name = apiTag;
 		packet.x = x;
 		packet.y = y;
 		packet.z = z;

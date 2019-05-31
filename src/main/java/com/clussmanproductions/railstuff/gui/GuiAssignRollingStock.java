@@ -27,7 +27,7 @@ public class GuiAssignRollingStock extends GuiScreen {
 		int horizontalCenter = width / 2;
 		int verticalCenter = height / 2;
 		text = new GuiTextField(0, fontRenderer, horizontalCenter - 150, verticalCenter, 300, 20);
-		text.setMaxStringLength(11);
+		//text.setMaxStringLength(11);
 		text.setVisible(true);
 		text.setFocused(true);
 		save = new GuiButton(1, horizontalCenter - 150, verticalCenter + 30, 300, 20, "Save");

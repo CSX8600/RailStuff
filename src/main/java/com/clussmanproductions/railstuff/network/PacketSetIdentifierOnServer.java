@@ -1,8 +1,13 @@
 package com.clussmanproductions.railstuff.network;
 
 import java.util.UUID;
+import org.apache.logging.log4j.Level;
 
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
+import cam72cam.immersiverailroading.thirdparty.CommonAPI;
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
+import com.google.common.base.Predicate;
 import com.jcraft.jogg.Packet;
 
 import io.netty.buffer.ByteBuf;
@@ -13,6 +18,8 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import javax.annotation.Nullable;
 
 public class PacketSetIdentifierOnServer implements IMessage {
 
@@ -45,9 +52,10 @@ public class PacketSetIdentifierOnServer implements IMessage {
 		private void handle(PacketSetIdentifierOnServer message, MessageContext ctx)
 		{
 			World world = ctx.getServerHandler().player.world;
-			RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-			data.setIdentifierGivenUUID(message.id, message.newName);
-			
+
+			EntityRollingStock stock = (EntityRollingStock) world.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(message.id);}).get(0);
+			stock.tag = message.newName;
+
 			PacketSetIdentifierForClient packet = new PacketSetIdentifierForClient();
 			packet.id = message.id;
 			packet.name = message.newName;

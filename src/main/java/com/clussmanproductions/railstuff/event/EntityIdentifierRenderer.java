@@ -3,9 +3,9 @@ package com.clussmanproductions.railstuff.event;
 
 import java.util.List;
 
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
 import org.lwjgl.opengl.GL11;
 
-import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
@@ -27,7 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @EventBusSubscriber(Side.CLIENT)
-public class EntityIdentifierRenderer {	
+public class EntityIdentifierRenderer {
+
 	public static void renderNameTag(Entity entity, float posX, float posY,
 			float posX2, RenderManager renderManager, FontRenderer fontRenderer, String name) {
 
@@ -92,7 +93,6 @@ public class EntityIdentifierRenderer {
 			return;
 		}
 		List<Entity> entities = Minecraft.getMinecraft().world.getLoadedEntityList();
-		RollingStockIdentificationData data = RollingStockIdentificationData.get(Minecraft.getMinecraft().world);
 		
 		for(Entity entity : entities)
 		{
@@ -100,17 +100,20 @@ public class EntityIdentifierRenderer {
 			{
 				continue;
 			}
-			String name = data.getIdentifierByUUID(entity.getPersistentID());
-			if (name.equals(""))
+
+			String apiTag = ((EntityRollingStock)entity).tag;
+
+			if (apiTag.equals(""))
 			{
 				continue;
 			}
-			
-			double x = interpolateValue(entity.prevPosX, entity.posX, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posX;
+
+			double x = interpolateValue(entity.prevPosX, entity.posX, e.getPartialTicks())  - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posX;
 			double y = interpolateValue(entity.prevPosY, entity.posY, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posY;
 			double z = interpolateValue(entity.prevPosZ, entity.posZ, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posZ;
-						
-			renderNameTag(entity, (float)x, (float)y, (float)z, Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderManager().getFontRenderer(), name);
+
+			renderNameTag(entity, (float)x, (float)y, (float)z, Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderManager().getFontRenderer(), apiTag);
+
 		}
 	}
 	
