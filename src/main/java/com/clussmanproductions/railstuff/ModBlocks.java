@@ -5,7 +5,6 @@ import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockGreenFlag;
 import com.clussmanproductions.railstuff.blocks.BlockManualSwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
-import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
@@ -26,8 +25,6 @@ public class ModBlocks {
 	public static BlockBlueFlag blue_flag;
 	@ObjectHolder("mast")
 	public static BlockMast mast;
-	@ObjectHolder("mast_fake")
-	public static BlockMastFake mast_fake;
 	@ObjectHolder("signal_head")
 	public static BlockSignalHead signal_head;
 	@ObjectHolder("end_abs")
@@ -41,5 +38,7 @@ public class ModBlocks {
 		green_flag.initModel();
 		blue_flag.initModel();
 		end_abs.initModel();
+		mast.initModel();
+		signal_head.initModel();
 	}
 }

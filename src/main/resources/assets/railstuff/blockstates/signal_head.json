@@ -1,7 +1,12 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "model": "railstuff:signal_head"
+        "model": "railstuff:signal_head",
+        "textures": {
+            "green": "railstuff:blocks/green",
+            "yellow": "railstuff:blocks/black_textured",
+            "red": "railstuff:blocks/black_textured"
+        }
     },
     "variants": {
         "inventory": [{}],

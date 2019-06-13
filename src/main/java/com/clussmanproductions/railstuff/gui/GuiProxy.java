@@ -32,9 +32,9 @@ public class GuiProxy implements IGuiHandler {
 				break;
 			case GuiIDs.SIGNAL:
 				SignalTileEntity te = (SignalTileEntity)world.getTileEntity(new BlockPos(x, y, z));
-				if (te != null && te.getMaster(world) != null)
+				if (te != null)
 				{
-					return new GuiSignal(te.getMaster(world));
+					return new GuiSignal(te);
 				}
 				break;
 		}

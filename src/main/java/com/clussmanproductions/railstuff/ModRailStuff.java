@@ -6,6 +6,7 @@ import com.clussmanproductions.railstuff.proxy.CommonProxy;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -27,7 +28,7 @@ public class ModRailStuff
 		
 		@Override
 		public ItemStack getTabIconItem() {
-			return new ItemStack(ModItems.signal);
+			return new ItemStack(Item.getItemFromBlock(ModBlocks.signal_head), 1, 0);
 		}
 	};
 	

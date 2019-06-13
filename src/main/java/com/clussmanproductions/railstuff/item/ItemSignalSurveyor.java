@@ -59,9 +59,7 @@ public class ItemSignalSurveyor extends Item {
 	}
 
 	private EnumActionResult pairToSignal(World worldIn, SignalTileEntity te, EntityPlayer player)
-	{
-		te = te.getMaster(worldIn);
-		
+	{		
 		NBTTagCompound tag = getTagOfSurveyor(player);
 		
 		int[] pairingpos = null;

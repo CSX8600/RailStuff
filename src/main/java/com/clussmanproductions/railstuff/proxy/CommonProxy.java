@@ -10,15 +10,12 @@ import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockGreenFlag;
 import com.clussmanproductions.railstuff.blocks.BlockManualSwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
-import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
-import com.clussmanproductions.railstuff.item.ItemSignal;
-import com.clussmanproductions.railstuff.item.ItemSignalDouble;
 import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
@@ -51,15 +48,14 @@ public class CommonProxy {
 			e.getRegistry().register(new ItemSignalSurveyor());
 		}
 		
-		e.getRegistry().register(new ItemSignal());
-		e.getRegistry().register(new ItemSignalDouble());
-		
 		e.getRegistry().register(new ItemBlock(ModBlocks.manual_switch_stand).setRegistryName(ModBlocks.manual_switch_stand.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.red_flag).setRegistryName(ModBlocks.red_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.yellow_flag).setRegistryName(ModBlocks.yellow_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.green_flag).setRegistryName(ModBlocks.green_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.blue_flag).setRegistryName(ModBlocks.blue_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.end_abs).setRegistryName(ModBlocks.end_abs.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.mast).setRegistryName(ModBlocks.mast.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.signal_head).setRegistryName(ModBlocks.signal_head.getRegistryName()));
 	}
 	
 	@SubscribeEvent
@@ -71,7 +67,6 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockGreenFlag());
 		e.getRegistry().register(new BlockBlueFlag());
 		e.getRegistry().register(new BlockMast());
-		e.getRegistry().register(new BlockMastFake());
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
 		
