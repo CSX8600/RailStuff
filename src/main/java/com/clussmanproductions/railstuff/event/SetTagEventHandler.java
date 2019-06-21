@@ -16,13 +16,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Level;
 
-@Mod.EventBusSubscriber
 public class SetTagEventHandler
 {
     @SubscribeEvent
     public static void setTag(TagEvent.SetTagEvent e) {
 
-        ModRailStuff.logger.log(Level.INFO, "GetTag");
         //World world = DimensionManager.getWorld(DimensionManager.getRegisteredDimensions().get(DimensionType.OVERWORLD).firstInt());
         World world = null;
         for (World w : DimensionManager.getWorlds()) {

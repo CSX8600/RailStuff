@@ -94,6 +94,12 @@ public class CommonProxy {
     public void init(FMLInitializationEvent event)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+
+        if (Loader.isModLoaded("immersiverailroading")) {
+			MinecraftForge.EVENT_BUS.register(SetTagEventHandler.class);
+			MinecraftForge.EVENT_BUS.register(SetTagEventHandler.class);
+		}
+
     }
     
     public void postInit(FMLPostInitializationEvent event)
