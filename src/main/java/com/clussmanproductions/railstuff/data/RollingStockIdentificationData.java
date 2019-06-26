@@ -9,11 +9,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
+import org.apache.logging.log4j.Level;
 
 public class RollingStockIdentificationData extends WorldSavedData {
 
+  public static final int MAX_IDENTIFIER_LENGTH = 11;
+
 	private static final String DATA_NAME = ModRailStuff.MODID + "_RollingStockIdentificationData";
 	private HashMap<UUID, String> identifiersByUUID = new HashMap<UUID, String>();
+	private HashMap<UUID, Boolean> overwriteOcTagsByUUID = new HashMap<UUID, Boolean>();
 	
 	public RollingStockIdentificationData(String name)
 	{
@@ -35,12 +39,16 @@ public class RollingStockIdentificationData extends WorldSavedData {
 			}
 			
 			String formattedKey = key.replace("_keyLeast", "_key").replaceAll("_keyMost", "_key");
-			
 			UUID id = nbt.getUniqueId(formattedKey);
 			String valueKey = formattedKey.replace("_key", "_value");
 			String value = nbt.getString(valueKey);
+			String overwriteKey = formattedKey.replace("_key", "_overwrite");
+			boolean overwriteOc = true;
+			if (nbt.hasKey(overwriteKey))
+				overwriteOc = nbt.getBoolean(overwriteKey);
 			
 			identifiersByUUID.put(id, value);
+			overwriteOcTagsByUUID.put(id, overwriteOc);
 		}
 	}
 
@@ -51,9 +59,11 @@ public class RollingStockIdentificationData extends WorldSavedData {
 		{
 			String keyKey = "item" + index + "_key";
 			String valueKey = "item" + index + "_value";
+			String overwriteKey = "item" + index + "_overwrite";
 			
 			compound.setUniqueId(keyKey, id);
 			compound.setString(valueKey, identifiersByUUID.get(id));
+			compound.setBoolean(overwriteKey, overwriteOcTagsByUUID.get(id));
 			
 			index++;
 		}
@@ -92,15 +102,37 @@ public class RollingStockIdentificationData extends WorldSavedData {
 		markDirty();
 	}
 
-	public void setData(HashMap<UUID, String> data)
+	public boolean getOverwriteOcTagsByUUID(UUID id)
 	{
-		identifiersByUUID = data;
+		if (overwriteOcTagsByUUID.containsKey(id))
+		{
+			return overwriteOcTagsByUUID.get(id);
+		}
+
+		return true;
+	}
+
+	public void setOverwriteOcTagsGivenUUID(UUID id, boolean value)
+	{
+		overwriteOcTagsByUUID.put(id, value);
+
+		markDirty();
+	}
+
+	public void setData(HashMap<UUID, String> identifiers, HashMap<UUID, Boolean> overwrite)
+	{
+		identifiersByUUID = identifiers;
+		overwriteOcTagsByUUID = overwrite;
 		
 		markDirty();
 	}
 	
-	public HashMap<UUID, String> getData()
+	public HashMap<UUID, String> getIdentifiers()
 	{
 		return identifiersByUUID;
+	}
+
+	public HashMap<UUID, Boolean> getOverwrites() {
+	  return overwriteOcTagsByUUID;
 	}
 }

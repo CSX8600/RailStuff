@@ -26,7 +26,9 @@ public class GetTagEventHandler {
             }
         }
         RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-        e.tag = data.getIdentifierByUUID(e.stockID);
+        ModRailStuff.logger.log(Level.INFO, data.getOverwriteOcTagsByUUID(e.stockID) ? "1" : "0");
+        if (data.getOverwriteOcTagsByUUID(e.stockID))
+            e.tag = data.getIdentifierByUUID(e.stockID);
 
     }
 }

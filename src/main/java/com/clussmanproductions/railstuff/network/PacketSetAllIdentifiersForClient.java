@@ -16,9 +16,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class PacketSetAllIdentifiersForClient implements IMessage {
 
 	public HashMap<UUID, String> values;
+	public HashMap<UUID, Boolean> overwrites;
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		values = new HashMap<UUID, String>();
+		overwrites = new HashMap<UUID, Boolean>();
 		
 		NBTTagCompound tag = ByteBufUtils.readTag(buf);
 		for(String key : tag.getKeySet())
@@ -33,8 +35,11 @@ public class PacketSetAllIdentifiersForClient implements IMessage {
 			UUID id = tag.getUniqueId(formattedKey);
 			String valueKey = formattedKey.replace("_key", "_value");
 			String value = tag.getString(valueKey);
+			String overwriteKey = formattedKey.replace("_key", "_overwrite");
+			boolean overwrite = tag.getBoolean(overwriteKey);
 			
 			values.put(id, value);
+			overwrites.put(id, overwrite);
 		}
 	}
 
@@ -47,6 +52,7 @@ public class PacketSetAllIdentifiersForClient implements IMessage {
 		{
 			tag.setUniqueId("item" + index + "_key", key);
 			tag.setString("item" + index + "_value", values.get(key));
+			tag.setBoolean("item" + index + "_overwrite", overwrites.get(key));
 			
 			index++;
 		}

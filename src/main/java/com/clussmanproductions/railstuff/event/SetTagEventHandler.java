@@ -24,17 +24,21 @@ public class SetTagEventHandler
         //World world = DimensionManager.getWorld(DimensionManager.getRegisteredDimensions().get(DimensionType.OVERWORLD).firstInt());
         World world = null;
         for (World w : DimensionManager.getWorlds()) {
-            if (w.getEntities(EntityRollingStock.class, p -> {return p.getPersistentID().equals(e.stockID);}).size() > 0) {
+            if (w.getEntities(EntityRollingStock.class, p -> p.getPersistentID().equals(e.stockID)).size() > 0) {
                 world = w;
                 break;
             }
         }
         RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-        data.setIdentifierGivenUUID(e.stockID, e.tag);
+        String croppedTag = e.tag.substring(0, Math.min(e.tag.length(), RollingStockIdentificationData.MAX_IDENTIFIER_LENGTH));
+        data.setIdentifierGivenUUID(e.stockID, croppedTag);
+        boolean overwrite = e.tag.length() <= RollingStockIdentificationData.MAX_IDENTIFIER_LENGTH;
+        data.setOverwriteOcTagsGivenUUID(e.stockID, overwrite);
 
         PacketSetIdentifierForClient packet = new PacketSetIdentifierForClient();
         packet.id = e.stockID;
-        packet.name = e.tag;
+        packet.name = croppedTag;
+        packet.overwrite = overwrite;
         PacketHandler.INSTANCE.sendToAll(packet);
 
     }

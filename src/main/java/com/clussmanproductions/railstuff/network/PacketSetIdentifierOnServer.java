@@ -18,11 +18,13 @@ public class PacketSetIdentifierOnServer implements IMessage {
 
 	public UUID id;
 	public String newName;
+	public boolean overwrite;
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		NBTTagCompound tag = ByteBufUtils.readTag(buf);
 		id = tag.getUniqueId("id");
 		newName = tag.getString("newName");
+		overwrite = tag.getBoolean("overwrite");
 	}
 
 	@Override
@@ -30,6 +32,7 @@ public class PacketSetIdentifierOnServer implements IMessage {
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setUniqueId("id", id);
 		tag.setString("newName", newName);
+		tag.setBoolean("overwrite", overwrite);
 		ByteBufUtils.writeTag(buf, tag);
 	}
 	
@@ -47,10 +50,12 @@ public class PacketSetIdentifierOnServer implements IMessage {
 			World world = ctx.getServerHandler().player.world;
 			RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
 			data.setIdentifierGivenUUID(message.id, message.newName);
+			data.setOverwriteOcTagsGivenUUID(message.id, message.overwrite);
 			
 			PacketSetIdentifierForClient packet = new PacketSetIdentifierForClient();
 			packet.id = message.id;
 			packet.name = message.newName;
+			packet.overwrite = message.overwrite;
 			PacketHandler.INSTANCE.sendToAll(packet);
 		}
 	}

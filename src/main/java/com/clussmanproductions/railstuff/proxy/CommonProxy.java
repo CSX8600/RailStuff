@@ -53,10 +53,10 @@ public class CommonProxy {
 			e.getRegistry().register(new ItemPaperwork());
 			e.getRegistry().register(new ItemSignalSurveyor());
 		}
-		
+
 		e.getRegistry().register(new ItemSignal());
 		e.getRegistry().register(new ItemSignalDouble());
-		
+
 		e.getRegistry().register(new ItemBlock(ModBlocks.manual_switch_stand).setRegistryName(ModBlocks.manual_switch_stand.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.red_flag).setRegistryName(ModBlocks.red_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.yellow_flag).setRegistryName(ModBlocks.yellow_flag.getRegistryName()));
@@ -64,7 +64,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.blue_flag).setRegistryName(ModBlocks.blue_flag.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.end_abs).setRegistryName(ModBlocks.end_abs.getRegistryName()));
 	}
-	
+
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> e)
 	{
@@ -77,36 +77,36 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockMastFake());
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
-		
+
 		GameRegistry.registerTileEntity(TileEntityManualSwitchStand.class, ModRailStuff.MODID + "_manual_switch_stand");
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");
 	}
-	
+
 	public void preInit(FMLPreInitializationEvent event)
-    {
-        PacketHandler.registerMessages("railstuff");
-        
-        File directory = event.getModConfigurationDirectory();
-        config = new Configuration(new File(directory.getPath(), "railstuff.cfg"));
-        Config.readConfig();
-    }
+	{
+		PacketHandler.registerMessages("railstuff");
 
-    public void init(FMLInitializationEvent event)
-    {
-        NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+		File directory = event.getModConfigurationDirectory();
+		config = new Configuration(new File(directory.getPath(), "railstuff.cfg"));
+		Config.readConfig();
+	}
 
-        if (Loader.isModLoaded("immersiverailroading")) {
+	public void init(FMLInitializationEvent event)
+	{
+		NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+
+		if (Loader.isModLoaded("immersiverailroading")) {
 			MinecraftForge.EVENT_BUS.register(SetTagEventHandler.class);
-			MinecraftForge.EVENT_BUS.register(SetTagEventHandler.class);
+			MinecraftForge.EVENT_BUS.register(GetTagEventHandler.class);
 		}
 
-    }
-    
-    public void postInit(FMLPostInitializationEvent event)
-    {
-    	if (config.hasChanged())
-    	{
-    		config.save();
-    	}
-    }
+	}
+
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		if (config.hasChanged())
+		{
+			config.save();
+		}
+	}
 }

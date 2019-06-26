@@ -16,6 +16,7 @@ public class PacketSetIdentifierForAssignGUI implements IMessage {
 
 	public UUID id;
 	public String name;
+	public boolean overwrite;
 	public int x;
 	public int y;
 	public int z;
@@ -24,6 +25,7 @@ public class PacketSetIdentifierForAssignGUI implements IMessage {
 		NBTTagCompound tag = ByteBufUtils.readTag(buf);
 		id = tag.getUniqueId("id");
 		name = tag.getString("name");
+		overwrite = tag.getBoolean("overwrite");
 		x = tag.getInteger("x");
 		y = tag.getInteger("y");
 		z = tag.getInteger("z");
@@ -34,6 +36,7 @@ public class PacketSetIdentifierForAssignGUI implements IMessage {
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setUniqueId("id", id);
 		tag.setString("name", name);
+		tag.setBoolean("overwrite", overwrite);
 		tag.setInteger("x", x);
 		tag.setInteger("y", y);
 		tag.setInteger("z", z);

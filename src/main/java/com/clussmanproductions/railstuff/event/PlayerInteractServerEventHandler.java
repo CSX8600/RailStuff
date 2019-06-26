@@ -43,10 +43,12 @@ public class PlayerInteractServerEventHandler {
 		
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(e.getWorld());
 		String name = data.getIdentifierByUUID(e.getTarget().getPersistentID());
+		boolean overwrite = data.getOverwriteOcTagsByUUID(e.getTarget().getPersistentID());
 		
 		PacketSetIdentifierForAssignGUI packet = new PacketSetIdentifierForAssignGUI();
 		packet.id = e.getTarget().getPersistentID();
 		packet.name = name;
+		packet.overwrite = overwrite;
 		packet.x = x;
 		packet.y = y;
 		packet.z = z;
