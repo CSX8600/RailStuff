@@ -5,6 +5,7 @@ import java.io.File;
 import com.clussmanproductions.railstuff.Config;
 import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
+import com.clussmanproductions.railstuff.blocks.BlockBNCASwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockBlueFlag;
 import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockGreenFlag;
@@ -56,6 +57,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.end_abs).setRegistryName(ModBlocks.end_abs.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.mast).setRegistryName(ModBlocks.mast.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.signal_head).setRegistryName(ModBlocks.signal_head.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.bnca_switch_stand).setRegistryName(ModBlocks.bnca_switch_stand.getRegistryName()));
 	}
 	
 	@SubscribeEvent
@@ -69,6 +71,7 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockMast());
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
+		e.getRegistry().register(new BlockBNCASwitchStand());
 		
 		GameRegistry.registerTileEntity(TileEntityManualSwitchStand.class, ModRailStuff.MODID + "_manual_switch_stand");
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");

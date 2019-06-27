@@ -1,5 +1,6 @@
 package com.clussmanproductions.railstuff;
 
+import com.clussmanproductions.railstuff.blocks.BlockBNCASwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockBlueFlag;
 import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockGreenFlag;
@@ -29,6 +30,8 @@ public class ModBlocks {
 	public static BlockSignalHead signal_head;
 	@ObjectHolder("end_abs")
 	public static BlockEndABS end_abs;
+	@ObjectHolder("bnca_switch_stand")
+	public static BlockBNCASwitchStand bnca_switch_stand;
 	
 	public static void initModels()
 	{
@@ -40,5 +43,6 @@ public class ModBlocks {
 		end_abs.initModel();
 		mast.initModel();
 		signal_head.initModel();
+		bnca_switch_stand.initModel();
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModItems;
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.model.ModelLoader;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.gui.GuiAssignRollingStock;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -32,6 +34,7 @@ public class ClientProxy extends CommonProxy {
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(event);
 		ModelLoaderRegistry.registerLoader(new ModelLoader());
+		OBJLoader.INSTANCE.addDomain(ModRailStuff.MODID);
 	}
 	@SubscribeEvent
 	public static void registerModels(ModelRegistryEvent e)

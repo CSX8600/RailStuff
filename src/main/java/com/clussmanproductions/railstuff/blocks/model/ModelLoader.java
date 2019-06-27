@@ -14,7 +14,8 @@ import net.minecraftforge.client.model.IModel;
 
 public class ModelLoader implements ICustomModelLoader {
 	private final Set<String> HANDLEABLE_NAMES = ImmutableSet.of(
-			"blue_flag");
+			"blue_flag",
+			"bnca_switch_stand");
 	private final Set<String> HANDLEABLE_INVENTORY_MODELS = ImmutableSet.of();
 
 	@Override
@@ -45,6 +46,8 @@ public class ModelLoader implements ICustomModelLoader {
 		{
 			case "blue_flag":
 				return new ModelBlueFlag();
+			case "bnca_switch_stand":
+				return new ModelBNCASwitchStand();
 		}
 		
 		throw new Exception("Model not found");
