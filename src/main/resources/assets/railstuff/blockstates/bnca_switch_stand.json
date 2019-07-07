@@ -1,14 +1,10 @@
 {
     "forge_marker": 1,
-    "defaults": {
-        "model": "railstuff:bnca-stand.obj",
-        "custom": { "flip-v": true }
-    },
     "variants": {
         "inventory": [{}],
         "facing=north": [{}],
-        "facing=west": { "y": 270 },
-        "facing=south": { "y": 180 },
-        "facing=east": { "y": 90 }
+        "facing=west": [{}],
+        "facing=south": [{}],
+        "facing=east": [{}]
     }
 }

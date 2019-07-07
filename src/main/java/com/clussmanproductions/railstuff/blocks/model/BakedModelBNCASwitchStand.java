@@ -11,10 +11,12 @@ import javax.vecmath.Vector4f;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.clussmanproductions.railstuff.blocks.BlockBNCASwitchStand;
+import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -27,19 +29,36 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.client.model.pipeline.VertexTransformer;
 import net.minecraftforge.common.model.TRSRTransformation;
 
-public class BakedModelBNCASwitchStand extends PerspectiveMapWrapper {
+public class BakedModelBNCASwitchStand implements IBakedModel {
 
-	IBakedModel originalModel;
+	IBakedModel originalModelBase;
+	IBakedModel originalModelHandle;
 	VertexFormat format;
-	public BakedModelBNCASwitchStand(VertexFormat format, IBakedModel originalModel) {
+	ImmutableMap<TransformType, TRSRTransformation> transforms;
+	public BakedModelBNCASwitchStand(VertexFormat format,
+			IBakedModel originalModelBase, 
+			IBakedModel originalModelHandle,
+			ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms) {
 		this.format = format;
-		this.originalModel = originalModel;
+		this.originalModelBase = originalModelBase;
+		this.originalModelHandle = originalModelHandle;
+		this.transforms = transforms;
 	}
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-		List<BakedQuad> quads = originalModel.getQuads(state, side, rand);
-		return transformedQuads(state.getValue(BlockBNCASwitchStand.FACING), quads);
+		ArrayList<BakedQuad> quads = new ArrayList<BakedQuad>(originalModelBase.getQuads(state, side, rand));
+		
+		if (state != null)
+		{
+			return transformedQuads(state.getValue(BlockBNCASwitchStand.FACING), quads);
+		}
+		else
+		{
+			List<BakedQuad> handleQuads = originalModelHandle.getQuads(state, side, rand);
+			quads.addAll(handleQuads);
+			return quads;
+		}
 	}
 	
 	private List<BakedQuad> transformedQuads(EnumFacing facing, List<BakedQuad> quads)
@@ -100,6 +119,11 @@ public class BakedModelBNCASwitchStand extends PerspectiveMapWrapper {
 	}
 
 	@Override
+	public ItemCameraTransforms getItemCameraTransforms() {
+		return ItemCameraTransforms.DEFAULT;
+	}
+
+	@Override
 	public boolean isAmbientOcclusion() {
 		// TODO Auto-generated method stub
 		return true;
@@ -108,7 +132,7 @@ public class BakedModelBNCASwitchStand extends PerspectiveMapWrapper {
 	@Override
 	public boolean isGui3d() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -125,12 +149,12 @@ public class BakedModelBNCASwitchStand extends PerspectiveMapWrapper {
 
 	@Override
 	public ItemOverrideList getOverrides() {
+		// TODO Auto-generated method stub
 		return ItemOverrideList.NONE;
 	}
-
+	
 	@Override
 	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
-		// TODO Auto-generated method stub
-		return IBakedModel.super.handlePerspective(cameraTransformType);
+		return PerspectiveMapWrapper.handlePerspective(this, transforms, cameraTransformType);
 	}
 }

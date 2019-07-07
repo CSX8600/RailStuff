@@ -11,7 +11,9 @@ import com.clussmanproductions.railstuff.gui.GuiAssignRollingStock;
 import com.clussmanproductions.railstuff.network.PacketSetAllIdentifiersForClient;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForClient;
+import com.clussmanproductions.railstuff.tile.TileEntityBNCASwitchStand;
 import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
+import com.clussmanproductions.railstuff.tile.render.BNCASwitchStandRenderer;
 import com.clussmanproductions.railstuff.tile.render.ManualSwitchStandRenderer;
 
 import net.minecraft.client.Minecraft;
@@ -43,6 +45,7 @@ public class ClientProxy extends CommonProxy {
 		ModItems.initModels();
 		
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityManualSwitchStand.class, new ManualSwitchStandRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBNCASwitchStand.class, new BNCASwitchStandRenderer());
 	}
 	
 	public static void handleSetIdentifierForAssignGUI(PacketSetIdentifierForAssignGUI message)

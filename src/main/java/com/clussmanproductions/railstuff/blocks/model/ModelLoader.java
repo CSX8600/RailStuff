@@ -16,7 +16,7 @@ public class ModelLoader implements ICustomModelLoader {
 	private final Set<String> HANDLEABLE_NAMES = ImmutableSet.of(
 			"blue_flag",
 			"bnca_switch_stand");
-	private final Set<String> HANDLEABLE_INVENTORY_MODELS = ImmutableSet.of();
+	private final Set<String> HANDLEABLE_INVENTORY_MODELS = ImmutableSet.of("bnca_switch_stand");
 
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) {

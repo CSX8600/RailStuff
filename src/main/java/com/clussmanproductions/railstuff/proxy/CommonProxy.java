@@ -20,6 +20,7 @@ import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.clussmanproductions.railstuff.tile.TileEntityBNCASwitchStand;
 import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
 
 import net.minecraft.block.Block;
@@ -75,6 +76,7 @@ public class CommonProxy {
 		
 		GameRegistry.registerTileEntity(TileEntityManualSwitchStand.class, ModRailStuff.MODID + "_manual_switch_stand");
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");
+		GameRegistry.registerTileEntity(TileEntityBNCASwitchStand.class, ModRailStuff.MODID + "_bnca_switch_stand");
 	}
 	
 	public void preInit(FMLPreInitializationEvent event)
