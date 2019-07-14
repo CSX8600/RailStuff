@@ -897,4 +897,14 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		
 		return 0xFFFFFF;
 	}
+
+	public void setOccupationOrigin(BlockPos newPos)
+	{
+		occupationOriginX = newPos.getX();
+		occupationOriginY = newPos.getY();
+		occupationOriginZ = newPos.getZ();
+		
+		markDirty();
+		notifyUpdate();
+	}
 }

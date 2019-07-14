@@ -10,6 +10,7 @@ import com.clussmanproductions.railstuff.util.EnumAspect;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -174,5 +175,15 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
 		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing());
+	}
+	
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		if (face == state.getValue(FACING))
+		{
+			return BlockFaceShape.SOLID;
+		}
+		
+		return BlockFaceShape.UNDEFINED;
 	}
 }

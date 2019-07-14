@@ -31,5 +31,6 @@ private static int packetId = 0;
 		INSTANCE.registerMessage(PacketSetAllIdentifiersForClient.Handler.class, PacketSetAllIdentifiersForClient.class, nextID(), Side.CLIENT);
 		INSTANCE.registerMessage(PacketSetIdentifierForClient.Handler.class, PacketSetIdentifierForClient.class, nextID(), Side.CLIENT);
 		INSTANCE.registerMessage(PacketSyncTEOnServer.Handler.class, PacketSyncTEOnServer.class, nextID(), Side.SERVER);
+		INSTANCE.registerMessage(PacketSetSignalOccupationOriginOnServer.Handler.class, PacketSetSignalOccupationOriginOnServer.class, nextID(), Side.SERVER);
 	}
 }

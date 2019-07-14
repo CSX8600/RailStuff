@@ -83,7 +83,6 @@ public class EntityIdentifierRenderer {
 	@SubscribeEvent
 	public static void renderWorldEvent(RenderWorldLastEvent e)
 	{
-		//testRender(e);
 		ItemStack heldItem = Minecraft.getMinecraft().player.inventory.getCurrentItem();
 		if (heldItem == null || !(heldItem.getItem() instanceof ItemPaperwork))
 		{
@@ -157,68 +156,5 @@ public class EntityIdentifierRenderer {
 		packet.z = z;
 		
 		PacketHandler.INSTANCE.sendToServer(packet);
-	}
-
-	private static void testRender(RenderWorldLastEvent e)
-	{
-		RayTraceResult rtr = Minecraft.getMinecraft().getRenderViewEntity().rayTrace(20, e.getPartialTicks());
-		
-		if (rtr.getBlockPos() != null)
-		{
-			BlockPos rtrPos = rtr.getBlockPos();
-			float f = 1.6F;
-			float f1 = 0.016666668F * f;
-			GL11.glPushMatrix();
-			
-			GlStateManager.disableTexture2D();
-			GlStateManager.disableLighting();
-			
-			//GL11.glScalef(f1, f1, f1);
-			GlStateManager.glLineWidth(1);
-			GlStateManager.translate(-Minecraft.getMinecraft().player.posX, -Minecraft.getMinecraft().player.posY, -Minecraft.getMinecraft().player.posZ);
-			GlStateManager.color(0F, 0F, 0F, 1F);
-			//GlStateManager.rotate(Minecraft.getMinecraft().player.rotationYawHead, 0, 1, 0);
-			Tessellator tess = Tessellator.getInstance();
-			BufferBuilder builder = tess.getBuffer();
-		
-			builder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-			
-			//builder.pos(rtr.hitVec.x, rtr.hitVec.y, rtr.hitVec.z).endVertex();
-			//builder.pos(Minecraft.getMinecraft().player.posX + 1, Minecraft.getMinecraft().player.posY + Minecraft.getMinecraft().player.eyeHeight, Minecraft.getMinecraft().player.posZ).endVertex();
-			//builder.pos(430, 57, -40).endVertex();
-			//builder.pos(430, 57, -41).endVertex();
-			
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY(), rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 2, rtrPos.getZ() + 0.5).endVertex();
-			tess.draw();
-
-			GlStateManager.color(1F, 1F, 0F, 1F);
-			tess = Tessellator.getInstance();
-			builder = tess.getBuffer();
-			
-			builder.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION);
-			
-			builder.pos(rtrPos.getX() + 1, rtrPos.getY() + 2, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 1.5, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX(), rtrPos.getY() + 2, rtrPos.getZ() + 0.5).endVertex();
-			
-			builder.pos(rtrPos.getX(), rtrPos.getY() + 2, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 1.5, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 1, rtrPos.getY() + 2, rtrPos.getZ() + 0.5).endVertex();
-			
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 2, rtrPos.getZ() + 1).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 1.5, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 2, rtrPos.getZ()).endVertex();
-			
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 2, rtrPos.getZ()).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 1.5, rtrPos.getZ() + 0.5).endVertex();
-			builder.pos(rtrPos.getX() + 0.5, rtrPos.getY() + 2, rtrPos.getZ() + 1).endVertex();
-			
-			tess.draw();
-			
-			GlStateManager.enableLighting();
-			GlStateManager.enableTexture2D();
-			GL11.glPopMatrix();
-		}
 	}
 }
