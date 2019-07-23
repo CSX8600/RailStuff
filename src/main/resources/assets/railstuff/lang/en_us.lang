@@ -6,6 +6,7 @@ tile.railstuff.blue_flag.name=Blue Flag
 tile.railstuff.end_abs.name=End ABS Sign
 tile.railstuff.signal_head.name=Signal
 tile.railstuff.mast.name=Mast
+tile.railstuff.whistle.name=Whistle Post
 
 item.railstuff.rolling_stock_assigner.name=Rolling Stock Assigner
 item.railstuff.paperwork.name=Paperwork
