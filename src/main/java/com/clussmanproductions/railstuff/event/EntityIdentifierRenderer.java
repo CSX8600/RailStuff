@@ -98,6 +98,7 @@ public class EntityIdentifierRenderer {
 		List<Entity> entities = Minecraft.getMinecraft().world.getLoadedEntityList();
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(Minecraft.getMinecraft().world);
 		
+		Entity viewEntity = Minecraft.getMinecraft().getRenderManager().renderViewEntity;
 		for(Entity entity : entities)
 		{
 			if (!rollingStockClass.isAssignableFrom(entity.getClass()))
@@ -110,15 +111,15 @@ public class EntityIdentifierRenderer {
 				continue;
 			}
 			
-			double x = interpolateValue(entity.prevPosX, entity.posX, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posX;
-			double y = interpolateValue(entity.prevPosY, entity.posY, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posY;
-			double z = interpolateValue(entity.prevPosZ, entity.posZ, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posZ;
+			double x = i(entity.lastTickPosX, entity.posX, e.getPartialTicks()) - i(viewEntity.lastTickPosX, viewEntity.posX, e.getPartialTicks());
+			double y = i(entity.lastTickPosY, entity.posY, e.getPartialTicks()) - i(viewEntity.lastTickPosY, viewEntity.posY, e.getPartialTicks());
+			double z = i(entity.lastTickPosZ, entity.posZ, e.getPartialTicks()) - i(viewEntity.lastTickPosZ, viewEntity.posZ, e.getPartialTicks());
 						
 			renderNameTag(entity, (float)x, (float)y, (float)z, Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderManager().getFontRenderer(), name);
 		}
 	}
 	
-	private static double interpolateValue(double start, double end, double pct)
+	private static double i(double start, double end, double pct)
     {
         return start + (end - start) * pct;
     }
