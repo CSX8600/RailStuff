@@ -10,6 +10,7 @@ import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockGreenFlag;
 import com.clussmanproductions.railstuff.blocks.BlockManualSwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
+import com.clussmanproductions.railstuff.blocks.BlockMilepost;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
@@ -20,6 +21,7 @@ import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
+import com.clussmanproductions.railstuff.tile.TileEntityMilepost;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -56,6 +58,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.end_abs).setRegistryName(ModBlocks.end_abs.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.mast).setRegistryName(ModBlocks.mast.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.signal_head).setRegistryName(ModBlocks.signal_head.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.milepost).setRegistryName(ModBlocks.milepost.getRegistryName()));
 	}
 	
 	@SubscribeEvent
@@ -69,9 +72,11 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockMast());
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
+		e.getRegistry().register(new BlockMilepost());
 		
 		GameRegistry.registerTileEntity(TileEntityManualSwitchStand.class, ModRailStuff.MODID + "_manual_switch_stand");
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");
+		GameRegistry.registerTileEntity(TileEntityMilepost.class, ModRailStuff.MODID + "_milepost");
 	}
 	
 	public void preInit(FMLPreInitializationEvent event)

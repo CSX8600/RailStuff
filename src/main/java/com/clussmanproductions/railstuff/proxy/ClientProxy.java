@@ -11,7 +11,9 @@ import com.clussmanproductions.railstuff.network.PacketSetAllIdentifiersForClien
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForClient;
 import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
+import com.clussmanproductions.railstuff.tile.TileEntityMilepost;
 import com.clussmanproductions.railstuff.tile.render.ManualSwitchStandRenderer;
+import com.clussmanproductions.railstuff.tile.render.MilepostRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -40,6 +42,7 @@ public class ClientProxy extends CommonProxy {
 		ModItems.initModels();
 		
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityManualSwitchStand.class, new ManualSwitchStandRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMilepost.class, new MilepostRenderer());
 	}
 	
 	public static void handleSetIdentifierForAssignGUI(PacketSetIdentifierForAssignGUI message)
