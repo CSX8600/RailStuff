@@ -7,6 +7,7 @@ import com.clussmanproductions.railstuff.blocks.BlockManualSwitchStand;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.blocks.BlockWhistle;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
 
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -29,6 +30,8 @@ public class ModBlocks {
 	public static BlockSignalHead signal_head;
 	@ObjectHolder("end_abs")
 	public static BlockEndABS end_abs;
+	@ObjectHolder("whistle")
+	public static BlockWhistle whistle;
 	
 	public static void initModels()
 	{
@@ -40,5 +43,6 @@ public class ModBlocks {
 		end_abs.initModel();
 		mast.initModel();
 		signal_head.initModel();
+		whistle.initModel();
 	}
 }
