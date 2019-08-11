@@ -1,0 +1,28 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "GRI",
+    "  I"  ],
+  "key": {
+    "I":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotIron"
+    },
+    "G":
+    {
+        "type": "forge:ore_dict",
+        "ore": "paneGlass"
+    },
+    "R":
+    {
+        "item": "minecraft:redstone_lamp",
+        "data": 0
+    }
+  },
+  "result": {
+    "item": "railstuff:signal_head",
+    "count": 1
+  }
+}
