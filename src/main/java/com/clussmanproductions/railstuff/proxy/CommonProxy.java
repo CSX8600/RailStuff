@@ -13,6 +13,7 @@ import com.clussmanproductions.railstuff.blocks.BlockMast;
 import com.clussmanproductions.railstuff.blocks.BlockMilepost;
 import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.blocks.BlockWhistle;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
@@ -59,6 +60,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.mast).setRegistryName(ModBlocks.mast.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.signal_head).setRegistryName(ModBlocks.signal_head.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.milepost).setRegistryName(ModBlocks.milepost.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.whistle).setRegistryName(ModBlocks.whistle.getRegistryName()));
 	}
 	
 	@SubscribeEvent
@@ -73,6 +75,7 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
 		e.getRegistry().register(new BlockMilepost());
+		e.getRegistry().register(new BlockWhistle());
 		
 		GameRegistry.registerTileEntity(TileEntityManualSwitchStand.class, ModRailStuff.MODID + "_manual_switch_stand");
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");
