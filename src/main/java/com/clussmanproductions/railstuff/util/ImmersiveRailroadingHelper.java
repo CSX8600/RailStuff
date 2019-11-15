@@ -113,47 +113,107 @@ public class ImmersiveRailroadingHelper {
 
 
 		if (te instanceof TileEntity && ((TileEntity) te).instance() instanceof TileRailBase) {
-			TileRailBase railBase = (TileRailBase) ((TileEntity) te).instance();
-
-			TileRail railParent = null;
-			TileRail rail = null;
-
-			if (railBase instanceof TileRail) {
-				railParent = railBase.getParentTile();
-				rail = (TileRail) railBase;
-			}
-
-			if (rail != null) {
-				if (railParent.info.settings.type != TrackItems.SWITCH) {
-					lastSwitchInfo.lastSwitchPlacementPosition = null;
-				} else if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(railParent.info.placementInfo.placementPosition)) {
-					// This is a new switch we are encountering - check to make sure
-					// the route is lined in a valid fashion
-
-					if (currentPosition.distanceTo(railParent.info.placementInfo.placementPosition.internal) <= 0.5) {
-						// We are on the facing point of the switch...we're good to go
-						lastSwitchInfo.lastSwitchPlacementPosition = rail.info.placementInfo.placementPosition.internal;
-					} else {
-						// We are on the trailing point of the switch...we need to make sure we're lined
-						IIterableTrack switchBuilder = (IIterableTrack) railParent.info.getBuilder();
-
-						boolean isOnStraight = switchBuilder.isOnTrack(railParent.info, new cam72cam.mod.math.Vec3d(currentPosition));
-						SwitchState switchState = SwitchUtil.getSwitchState(rail);
-
-						if ((isOnStraight && switchState == SwitchState.TURN) ||
-								(!isOnStraight && switchState == SwitchState.STRAIGHT)) {
-							// We're incorrectly lined, stop here
+//			TileRailBase railBase = (TileRailBase) ((TileEntity) te).instance();
+//
+//			TileRail railParent = railBase.findSwitchParent(railBase);
+//			TileRail rail = null;
+//
+//			if (railBase instanceof TileRail) {
+//				railParent = railBase.getParentTile();
+//				rail = (TileRail) railBase;
+//			}
+//
+//			if (rail != null) {
+//				if (railParent.info.settings.type != TrackItems.SWITCH) {
+//					lastSwitchInfo.lastSwitchPlacementPosition = null;
+//				} else if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(railParent.info.placementInfo.placementPosition)) {
+//					// This is a new switch we are encountering - check to make sure
+//					// the route is lined in a valid fashion
+//
+//					if (currentPosition.distanceTo(railParent.info.placementInfo.placementPosition.internal) <= 0.5) {
+//						// We are on the facing point of the switch...we're good to go
+//						lastSwitchInfo.lastSwitchPlacementPosition = rail.info.placementInfo.placementPosition.internal;
+//					} else {
+//						// We are on the trailing point of the switch...we need to make sure we're lined
+//						IIterableTrack switchBuilder = (IIterableTrack) railParent.info.getBuilder();
+//
+//						boolean isOnStraight = switchBuilder.isOnTrack(railParent.info, new cam72cam.mod.math.Vec3d(currentPosition));
+//						SwitchState switchState = SwitchUtil.getSwitchState(rail);
+//
+//						if ((isOnStraight && switchState == SwitchState.TURN) ||
+//								(!isOnStraight && switchState == SwitchState.STRAIGHT)) {
+//							// We're incorrectly lined, stop here
+//							return currentPosition;
+//						}
+//
+//						if (switchState != SwitchState.NONE) {
+//							// We're correctly lined, ignore the rest of this switch
+//							lastSwitchInfo.lastSwitchPlacementPosition = railParent.info.placementInfo.placementPosition.internal;
+//						}
+//					}
+//				}
+//			}
+//			return railBase.getNextPosition(new cam72cam.mod.math.Vec3d(currentPosition), new cam72cam.mod.math.Vec3d(motion)).internal;
+			
+			TileRailBase currentRailBase = (TileRailBase)((TileEntity)te).instance();
+			
+			TileRail switchTile = currentRailBase.findSwitchParent(currentRailBase);
+			
+			if (switchTile != null)
+			{
+				// Skip if we came from facing point - no need to check it since we're moving in the facing-point direction
+				if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(switchTile.info.placementInfo.placementPosition.internal))
+				{
+					// We're in here because this is either the first time we've encountered a switch
+					// or we encountered a new chained-switch.
+					// First, we need to see if we're at the facing point of the switch
+					if (currentPosition.distanceTo(switchTile.info.placementInfo.placementPosition.internal) <= 0.5)
+					{
+						// We are at the facing point.  Set last placement info
+						// to indicate we've reached it
+						lastSwitchInfo.lastSwitchPlacementPosition = switchTile.info.placementInfo.placementPosition.internal;
+					}
+					else
+					{
+						// We are at the trailing point.  Now we need to see if
+						// the switch is properly lined for our movement.
+						
+						IIterableTrack builder = (IIterableTrack)switchTile.info.getBuilder();
+						
+						boolean isOnStraight = builder.isOnTrack(switchTile.info, new cam72cam.mod.math.Vec3d(currentPosition));
+						
+						Vec3d placementPosition = switchTile.info.placementInfo.placementPosition.internal;
+						ITrack placementITrack = Util.getTileEntity(world, placementPosition, false);
+						
+						if (placementITrack == null || !(placementITrack instanceof TileEntity) || !(((TileEntity)placementITrack).instance() instanceof TileRailBase))
+						{
+							// Can't determine switch state
+							// Assume wrong
 							return currentPosition;
 						}
-
-						if (switchState != SwitchState.NONE) {
-							// We're correctly lined, ignore the rest of this switch
-							lastSwitchInfo.lastSwitchPlacementPosition = railParent.info.placementInfo.placementPosition.internal;
+						
+						TileRail placementTileEntity = ((TileRailBase)((TileEntity)placementITrack).instance()).getParentTile();
+						
+						if((placementTileEntity.info.switchState == SwitchState.STRAIGHT && !isOnStraight) ||
+							(placementTileEntity.info.switchState == SwitchState.TURN && isOnStraight))
+						{
+							// This switch is not correctly lined for movement
+							// Stopping here
+							return currentPosition;
+						}
+						else
+						{
+							// This switch IS correctly lined
+							// Mark this switch okay for next time
+							lastSwitchInfo.lastSwitchPlacementPosition = placementPosition;
 						}
 					}
 				}
 			}
-			return railBase.getNextPosition(new cam72cam.mod.math.Vec3d(currentPosition), new cam72cam.mod.math.Vec3d(motion)).internal;
+			else
+			{
+				lastSwitchInfo.lastSwitchPlacementPosition = null;
+			}
 		}
 		
 		return te.getNextPosition(currentPosition, motion);
