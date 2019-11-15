@@ -113,47 +113,6 @@ public class ImmersiveRailroadingHelper {
 
 
 		if (te instanceof TileEntity && ((TileEntity) te).instance() instanceof TileRailBase) {
-//			TileRailBase railBase = (TileRailBase) ((TileEntity) te).instance();
-//
-//			TileRail railParent = railBase.findSwitchParent(railBase);
-//			TileRail rail = null;
-//
-//			if (railBase instanceof TileRail) {
-//				railParent = railBase.getParentTile();
-//				rail = (TileRail) railBase;
-//			}
-//
-//			if (rail != null) {
-//				if (railParent.info.settings.type != TrackItems.SWITCH) {
-//					lastSwitchInfo.lastSwitchPlacementPosition = null;
-//				} else if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(railParent.info.placementInfo.placementPosition)) {
-//					// This is a new switch we are encountering - check to make sure
-//					// the route is lined in a valid fashion
-//
-//					if (currentPosition.distanceTo(railParent.info.placementInfo.placementPosition.internal) <= 0.5) {
-//						// We are on the facing point of the switch...we're good to go
-//						lastSwitchInfo.lastSwitchPlacementPosition = rail.info.placementInfo.placementPosition.internal;
-//					} else {
-//						// We are on the trailing point of the switch...we need to make sure we're lined
-//						IIterableTrack switchBuilder = (IIterableTrack) railParent.info.getBuilder();
-//
-//						boolean isOnStraight = switchBuilder.isOnTrack(railParent.info, new cam72cam.mod.math.Vec3d(currentPosition));
-//						SwitchState switchState = SwitchUtil.getSwitchState(rail);
-//
-//						if ((isOnStraight && switchState == SwitchState.TURN) ||
-//								(!isOnStraight && switchState == SwitchState.STRAIGHT)) {
-//							// We're incorrectly lined, stop here
-//							return currentPosition;
-//						}
-//
-//						if (switchState != SwitchState.NONE) {
-//							// We're correctly lined, ignore the rest of this switch
-//							lastSwitchInfo.lastSwitchPlacementPosition = railParent.info.placementInfo.placementPosition.internal;
-//						}
-//					}
-//				}
-//			}
-//			return railBase.getNextPosition(new cam72cam.mod.math.Vec3d(currentPosition), new cam72cam.mod.math.Vec3d(motion)).internal;
 			
 			TileRailBase currentRailBase = (TileRailBase)((TileEntity)te).instance();
 			
