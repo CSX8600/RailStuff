@@ -1,30 +1,33 @@
 package com.clussmanproductions.railstuff.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import cam72cam.mod.block.tile.TileEntity;
-import cam72cam.mod.entity.ModdedEntity;
-import cam72cam.mod.math.Vec3i;
-import com.clussmanproductions.railstuff.ModRailStuff;
+import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
+import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
+import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
+import com.clussmanproductions.railstuff.network.PacketHandler;
+import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 
-import cam72cam.immersiverailroading.blocks.BlockRailBase;
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
+import cam72cam.immersiverailroading.entity.EntityRollingStock;
 import cam72cam.immersiverailroading.library.SwitchState;
-import cam72cam.immersiverailroading.library.TrackItems;
 import cam72cam.immersiverailroading.tile.TileRail;
 import cam72cam.immersiverailroading.tile.TileRailBase;
-import cam72cam.immersiverailroading.tile.TileRailGag;
-import cam72cam.immersiverailroading.track.BuilderSwitch;
 import cam72cam.immersiverailroading.track.IIterableTrack;
-import cam72cam.immersiverailroading.util.SwitchUtil;
+import cam72cam.mod.block.tile.TileEntity;
+import cam72cam.mod.entity.ModdedEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import trackapi.lib.ITrack;
 import trackapi.lib.Util;
 
@@ -190,5 +193,89 @@ public class ImmersiveRailroadingHelper {
 				.collect(Collectors.toList());
 
 		return !stocks.isEmpty();
+	}
+
+	public static void handlePlayerInteract(PlayerInteractEvent.EntityInteract e)
+	{
+		if (!(e.getTarget() instanceof ModdedEntity))
+		{
+			return;
+		}
+		
+		ModdedEntity moddedEntity = (ModdedEntity)e.getTarget();
+		if (!(moddedEntity.getSelf() instanceof EntityRollingStock))
+		{
+			return;
+		}
+		
+		if (!(e.getEntityPlayer().inventory.getCurrentItem().getItem() instanceof ItemRollingStockAssigner))
+		{
+			return;
+		}
+		
+		e.setCanceled(true);
+		Entity entity = e.getTarget();
+		int x = (int)Math.floor(entity.posX);
+		int y = (int)Math.floor(entity.posY);
+		int z = (int)Math.floor(entity.posZ);
+		
+		PacketGetIdentifierForAssignGUI packet = new PacketGetIdentifierForAssignGUI();
+		packet.id = entity.getPersistentID();
+		packet.x = x;
+		packet.y = y;
+		packet.z = z;
+		
+		PacketHandler.INSTANCE.sendToServer(packet);
+	}
+	
+	public static void handlePlayerInteractServer(PlayerInteractEvent.EntityInteract e)
+	{
+		if (!(e.getTarget() instanceof ModdedEntity))
+		{
+			return;
+		}
+		
+		ModdedEntity moddedEntity = (ModdedEntity)e.getTarget();
+		if (!(moddedEntity.getSelf() instanceof EntityRollingStock))
+		{
+			return;
+		}
+		
+		if (!(e.getEntityPlayer().inventory.getCurrentItem().getItem() instanceof ItemRollingStockAssigner))
+		{
+			return;
+		}
+		
+		e.setCanceled(true);
+		Entity entity = e.getTarget();
+		int x = (int)Math.floor(entity.posX);
+		int y = (int)Math.floor(entity.posY);
+		int z = (int)Math.floor(entity.posZ);
+		
+		RollingStockIdentificationData data = RollingStockIdentificationData.get(e.getWorld());
+		String name = data.getIdentifierByUUID(e.getTarget().getPersistentID());
+		
+		PacketSetIdentifierForAssignGUI packet = new PacketSetIdentifierForAssignGUI();
+		packet.id = e.getTarget().getPersistentID();
+		packet.name = name;
+		packet.x = x;
+		packet.y = y;
+		packet.z = z;
+		
+		PacketHandler.INSTANCE.sendTo(packet, (EntityPlayerMP)e.getEntityPlayer());
+	}
+
+	public static List<Entity> getLoadedIRStock(World world)
+	{
+		ArrayList<Entity> entities = new ArrayList<Entity>();
+		for(Entity entity : world.getLoadedEntityList())
+		{
+			if (entity instanceof ModdedEntity && ((ModdedEntity)entity).getSelf() instanceof EntityRollingStock)
+			{
+				entities.add(entity);
+			}
+		}
+		
+		return entities;
 	}
 }

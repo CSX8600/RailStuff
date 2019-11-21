@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketHandler;
+import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -83,28 +85,21 @@ public class EntityIdentifierRenderer {
 	@SubscribeEvent
 	public static void renderWorldEvent(RenderWorldLastEvent e)
 	{
+		if (!ModRailStuff.IR_INSTALLED)
+		{
+			return;
+		}
+		
 		ItemStack heldItem = Minecraft.getMinecraft().player.inventory.getCurrentItem();
 		if (heldItem == null || !(heldItem.getItem() instanceof ItemPaperwork))
 		{
 			return;
 		}
-		
-		Class rollingStockClass = null;
-		try {
-			rollingStockClass = Class.forName("cam72cam.immersiverailroading.entity.EntityRollingStock");
-		} catch (ClassNotFoundException e1) {
-			return;
-		}
-		List<Entity> entities = Minecraft.getMinecraft().world.getLoadedEntityList();
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(Minecraft.getMinecraft().world);
 		
 		Entity viewEntity = Minecraft.getMinecraft().getRenderManager().renderViewEntity;
-		for(Entity entity : entities)
+		for(Entity entity : ImmersiveRailroadingHelper.getLoadedIRStock(Minecraft.getMinecraft().world))
 		{
-			if (!rollingStockClass.isAssignableFrom(entity.getClass()))
-			{
-				continue;
-			}
 			String name = data.getIdentifierByUUID(entity.getPersistentID());
 			if (name.equals(""))
 			{
@@ -127,35 +122,9 @@ public class EntityIdentifierRenderer {
 	@SubscribeEvent
 	public static void playerInteract(PlayerInteractEvent.EntityInteract e)
 	{
-		Class rollingStockClass = null;
-		try {
-			rollingStockClass = Class.forName("cam72cam.immersiverailroading.entity.EntityRollingStock");
-		} catch (ClassNotFoundException e1) {
-			return;
-		}
-		
-		if (!rollingStockClass.isAssignableFrom(e.getTarget().getClass()))
+		if (ModRailStuff.IR_INSTALLED)
 		{
-			return;
+			ImmersiveRailroadingHelper.handlePlayerInteract(e);
 		}
-		
-		if (!(e.getEntityPlayer().inventory.getCurrentItem().getItem() instanceof ItemRollingStockAssigner))
-		{
-			return;
-		}
-		
-		e.setCanceled(true);
-		Entity entity = e.getTarget();
-		int x = (int)Math.floor(entity.posX);
-		int y = (int)Math.floor(entity.posY);
-		int z = (int)Math.floor(entity.posZ);
-		
-		PacketGetIdentifierForAssignGUI packet = new PacketGetIdentifierForAssignGUI();
-		packet.id = entity.getPersistentID();
-		packet.x = x;
-		packet.y = y;
-		packet.z = z;
-		
-		PacketHandler.INSTANCE.sendToServer(packet);
 	}
 }
