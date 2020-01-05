@@ -212,6 +212,7 @@ public class ItemSignalSurveyor extends Item {
 		if (tag == null)
 		{
 			tag = new NBTTagCompound();
+			player.inventory.getCurrentItem().setTagCompound(tag);
 		}
 		
 		return tag;
