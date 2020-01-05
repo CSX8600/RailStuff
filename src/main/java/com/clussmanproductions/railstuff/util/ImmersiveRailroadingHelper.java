@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.google.common.base.Supplier;
 
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.entity.EntityRollingStock;
@@ -22,6 +24,7 @@ import cam72cam.mod.block.tile.TileEntity;
 import cam72cam.mod.entity.ModdedEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -119,7 +122,16 @@ public class ImmersiveRailroadingHelper {
 			
 			TileRailBase currentRailBase = (TileRailBase)((TileEntity)te).instance();
 			
-			TileRail switchTile = currentRailBase.findSwitchParent(currentRailBase);
+			TileRail switchTile;
+			try
+			{
+				switchTile = currentRailBase.findSwitchParent(currentRailBase);
+			}
+			catch(Exception ex)
+			{
+				ModRailStuff.logger.warn("An error occurred while trying to find switch parent.  Was the rail removed while searching for trains?", ex);
+				return currentPosition;
+			}
 			
 			if (switchTile != null)
 			{
@@ -277,5 +289,16 @@ public class ImmersiveRailroadingHelper {
 		}
 		
 		return entities;
+	}
+
+	public static EnumActionResult handleSignalCustomOrigin(Supplier<EnumActionResult> setCustomOriginMethod, BlockPos pos, World world)
+	{
+		ITrack trackTE = Util.getTileEntity(world, new Vec3d(pos), false);
+		if (trackTE == null)
+		{
+			return null;
+		}
+		
+		return setCustomOriginMethod.get();
 	}
 }

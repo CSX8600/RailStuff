@@ -62,14 +62,14 @@ public class ItemSignalSurveyor extends Item {
 			return pairToSign(worldIn, pos, player);
 		}
 		
-		try {
-			Class railBaseClass = Class.forName("cam72cam.immersiverailroading.blocks.BlockRailBase");
-			
-			if (railBaseClass.isAssignableFrom(state.getBlock().getClass()))
+		if (ModRailStuff.IR_INSTALLED)
+		{
+			EnumActionResult res = ImmersiveRailroadingHelper.handleSignalCustomOrigin(() -> setOccupationOrigin(worldIn, pos, player), pos, worldIn);
+			if (res != null)
 			{
-				return setOccupationOrigin(worldIn, pos, player);
+				return res;
 			}
-		} catch (Exception e) {}
+		}
 		
 		return EnumActionResult.PASS;
 	}
