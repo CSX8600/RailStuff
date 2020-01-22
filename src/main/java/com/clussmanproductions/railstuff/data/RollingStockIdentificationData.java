@@ -9,7 +9,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
-import org.apache.logging.log4j.Level;
 
 public class RollingStockIdentificationData extends WorldSavedData {
 
@@ -109,7 +108,7 @@ public class RollingStockIdentificationData extends WorldSavedData {
 			return overwriteOcTagsByUUID.get(id);
 		}
 
-		return true;
+		return false;
 	}
 
 	public void setOverwriteOcTagsGivenUUID(UUID id, boolean value)
