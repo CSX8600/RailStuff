@@ -1,9 +1,9 @@
 { 
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "III",
-    "GRI",
-    "  I"  ],
+    " G ",
+    "IRI",
+    "III"  ],
   "key": {
     "I":
     {
@@ -13,16 +13,16 @@
     "G":
     {
         "type": "forge:ore_dict",
-        "ore": "paneGlass"
+        "ore": "ingotGold"
     },
     "R":
     {
-        "item": "minecraft:redstone_lamp",
-        "data": 0
+        "type": "forge:ore_dict",
+        "ore": "dustRedstone"
     }
   },
   "result": {
-    "item": "railstuff:signal",
+    "item": "railstuff:signal_surveyor",
     "count": 1
   }
 }

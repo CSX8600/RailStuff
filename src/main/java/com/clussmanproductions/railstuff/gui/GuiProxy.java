@@ -3,6 +3,7 @@ package com.clussmanproductions.railstuff.gui;
 import java.util.List;
 
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.clussmanproductions.railstuff.tile.TileEntityMilepost;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,9 +33,16 @@ public class GuiProxy implements IGuiHandler {
 				break;
 			case GuiIDs.SIGNAL:
 				SignalTileEntity te = (SignalTileEntity)world.getTileEntity(new BlockPos(x, y, z));
-				if (te != null && te.getMaster(world) != null)
+				if (te != null)
 				{
-					return new GuiSignal(te.getMaster(world));
+					return new GuiSignal(te);
+				}
+				break;
+			case GuiIDs.MILEPOST:
+				TileEntityMilepost milepostTE = (TileEntityMilepost)world.getTileEntity(new BlockPos(x, y, z));
+				if (milepostTE != null)
+				{
+					return new GuiMilepost(milepostTE);
 				}
 				break;
 		}
@@ -46,5 +54,6 @@ public class GuiProxy implements IGuiHandler {
 	{
 		public static final int ASSIGN_ROLLING_STOCK = 1;
 		public static final int SIGNAL = 2;
+		public static final int MILEPOST = 3;
 	}
 }

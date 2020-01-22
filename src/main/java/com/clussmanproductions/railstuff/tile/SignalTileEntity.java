@@ -1,11 +1,12 @@
 package com.clussmanproductions.railstuff.tile;
 
 import com.clussmanproductions.railstuff.Config;
+import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
-import com.clussmanproductions.railstuff.blocks.BlockMastFake;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.util.EnumAspect;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
 import net.minecraft.block.Block;
@@ -28,14 +29,6 @@ import scala.Tuple3;
 
 public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 
-	private boolean isMaster;
-	private int masterX;
-	private int masterY;
-	private int masterZ;
-	private int signalHeadX;
-	private int signalHeadY;
-	private int signalHeadZ;
-	private boolean isBreaking;
 	private Mode mode = Mode.Manual;
 	private Aspect unpoweredAspect = Aspect.Dark;
 	private Aspect poweredAspect = Aspect.Dark;
@@ -64,13 +57,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		compound.setBoolean("isMaster", isMaster);
-		compound.setInteger("masterX", masterX);
-		compound.setInteger("masterY", masterY);
-		compound.setInteger("masterZ", masterZ);
-		compound.setInteger("signalHeadX", signalHeadX);
-		compound.setInteger("signalHeadY", signalHeadY);
-		compound.setInteger("signalHeadZ", signalHeadZ);
 		compound.setInteger("mode", mode.index);
 		compound.setInteger("unpoweredAspect", unpoweredAspect.index);
 		compound.setInteger("poweredAspect", poweredAspect.index);
@@ -95,13 +81,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		isMaster = compound.getBoolean("isMaster");
-		masterX = compound.getInteger("masterX");
-		masterY = compound.getInteger("masterY");
-		masterZ = compound.getInteger("masterZ");
-		signalHeadX = compound.getInteger("signalHeadX");
-		signalHeadY = compound.getInteger("signalHeadY");
-		signalHeadZ = compound.getInteger("signalHeadZ");
 		mode = Mode.get(compound.getInteger("mode"));
 		unpoweredAspect = Aspect.get(compound.getInteger("unpoweredAspect"));
 		poweredAspect = Aspect.get(compound.getInteger("poweredAspect"));
@@ -139,75 +118,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			registeredEndPoint = new Tuple3<BlockPos, BlockPos, String>(new BlockPos(endPointArray[0], endPointArray[1], endPointArray[2]), new BlockPos(teArray[0], teArray[1], teArray[2]), endPointName);
 		}
 	}
-	
-	public void setMaster()
-	{
-		isMaster = true;
-		markDirty();
-	}
-	
-	public void setMasterLocation(BlockPos pos)
-	{
-		masterX = pos.getX();
-		masterY = pos.getY();
-		masterZ = pos.getZ();
-		markDirty();
-	}
-	
-	public void setSignalHeadLocation(BlockPos pos)
-	{
-		signalHeadX = pos.getX();
-		signalHeadY = pos.getY();
-		signalHeadZ = pos.getZ();
-		
-		markDirty();
-	}
-	
-	public SignalTileEntity getMaster(World world)
-	{
-		if (isMaster)
-		{
-			return this;
-		}
-		
-		BlockPos pos = new BlockPos(masterX, masterY, masterZ);
-		TileEntity te = world.getTileEntity(pos);
-		
-		if (te != null && te instanceof SignalTileEntity)
-		{
-			return (SignalTileEntity)te;
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Only call on master TE...if this is not master, it will be ignored
-	 */
-	public void onBreak(World world)
-	{
-		if (!isMaster)
-		{
-			return;
-		}
-		
-		if (isBreaking)
-		{
-			return;
-		}
-		
-		isBreaking = true;		
-		BlockPos workingPos = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
-		
-		boolean workingIsMaster = true;
-		for(int i = 0; i < 5; i++)
-		{
-			world.destroyBlock(workingPos, workingIsMaster);
-			workingIsMaster = false;
-			workingPos = workingPos.up();
-		}
-	}
-
 	
 	public enum Mode
 	{
@@ -310,13 +220,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		NBTTagCompound tag = super.getUpdateTag();
-		tag.setBoolean("isMaster", isMaster);
-		tag.setInteger("masterX", masterX);
-		tag.setInteger("masterY", masterY);
-		tag.setInteger("masterZ", masterZ);
-		tag.setInteger("signalHeadX", signalHeadX);
-		tag.setInteger("signalHeadY", signalHeadY);
-		tag.setInteger("signalHeadZ", signalHeadZ);
 		tag.setInteger("mode", mode.index);
 		tag.setInteger("unpoweredAspect", unpoweredAspect.index);
 		tag.setInteger("poweredAspect", poweredAspect.index);
@@ -339,13 +242,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	@Override
 	public void handleUpdateTag(NBTTagCompound tag) {
 		super.handleUpdateTag(tag);
-		isMaster = tag.getBoolean("isMaster");
-		masterX = tag.getInteger("masterX");
-		masterY = tag.getInteger("masterY");
-		masterZ = tag.getInteger("masterZ");
-		signalHeadX = tag.getInteger("signalHeadX");
-		signalHeadY = tag.getInteger("signalHeadY");
-		signalHeadZ = tag.getInteger("signalHeadZ");
 		name = tag.getString("name");
 		mode = Mode.get(tag.getInteger("mode"));
 		unpoweredAspect = Aspect.get(tag.getInteger("unpoweredAspect"));
@@ -429,8 +325,15 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	
 	private void setOccupationOrigin()
 	{
-		EnumFacing signalFacing = world.getBlockState(getSignalHeadPos()).getValue(BlockSignalHead.FACING);
-		Vec3d origin = ImmersiveRailroadingHelper.findOrigin(getPos(), signalFacing, world);
+		EnumFacing signalFacing = world.getBlockState(getPos()).getValue(BlockSignalHead.FACING);
+		
+		BlockPos workingPos = getPos();
+		while((world.getBlockState(workingPos).getBlock() instanceof BlockSignalHead) || (world.getBlockState(workingPos).getBlock() instanceof BlockMast))
+		{
+			workingPos = workingPos.down();
+		}
+		workingPos = workingPos.up();
+		Vec3d origin = ImmersiveRailroadingHelper.findOrigin(workingPos, signalFacing, world);
 		
 		boolean willNotify = occupationOriginY != origin.y;
 		occupationOriginX = origin.x;
@@ -451,7 +354,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 
 	@Override
 	public void update() {
-		if (world.isRemote || !isMaster)
+		if (world.isRemote)
 		{
 			return;
 		}
@@ -459,21 +362,21 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		if (!hasUpdatedBlockState && mode == Mode.Manual)
 		{
 			boolean powered = world.isBlockPowered(getPos());
-			BlockSignalHead.Aspect blockAspect = BlockSignalHead.Aspect.Dark;
+			EnumAspect blockAspect = EnumAspect.Dark;
 			if (powered)
 			{
 				switch(poweredAspect)
 				{
 					case Green:
-						blockAspect = BlockSignalHead.Aspect.Green;
+						blockAspect = EnumAspect.Green;
 						break;
 					case Yellow:
 					case YellowFlashing:
-						blockAspect = BlockSignalHead.Aspect.Yellow;
+						blockAspect = EnumAspect.Yellow;
 						break;
 					case Red:
 					case RedFlashing:
-						blockAspect = BlockSignalHead.Aspect.Red;
+						blockAspect = EnumAspect.Red;
 						break;
 				}
 			}
@@ -482,27 +385,22 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 				switch(unpoweredAspect)
 				{
 					case Green:
-						blockAspect = BlockSignalHead.Aspect.Green;
+						blockAspect = EnumAspect.Green;
 						break;
 					case Yellow:
 					case YellowFlashing:
-						blockAspect = BlockSignalHead.Aspect.Yellow;
+						blockAspect = EnumAspect.Yellow;
 						break;
 					case Red:
 					case RedFlashing:
-						blockAspect = BlockSignalHead.Aspect.Red;
+						blockAspect = EnumAspect.Red;
 						break;
 				}
 			}
 			
-			IBlockState currentState = world.getBlockState(getSignalHeadPos());
+			IBlockState currentState = world.getBlockState(getPos());
 			
-			if (!(currentState.getBlock() instanceof BlockSignalHead))
-			{
-				return;
-			}
-			
-			world.setBlockState(getSignalHeadPos(), currentState.withProperty(BlockSignalHead.ASPECT, blockAspect));
+			world.setBlockState(getPos(), currentState.withProperty(BlockSignalHead.ASPECT, blockAspect));
 			
 			hasUpdatedBlockState = true;
 		}
@@ -530,7 +428,20 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	{
 		if (mode == Mode.Manual)
 		{
-			boolean isPowered = world.isBlockPowered(getPos());
+			BlockPos workingPos = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
+			IBlockState workingState = world.getBlockState(workingPos);
+			
+			while(workingState.getBlock() == ModBlocks.mast || workingState.getBlock() == ModBlocks.signal_head)
+			{
+				workingPos = workingPos.down();
+				
+				workingState = world.getBlockState(workingPos);
+			}
+
+			workingPos = workingPos.up();
+
+			boolean isPowered = world.isBlockPowered(workingPos);
+			
 			if (isPowered && 
 					(poweredAspect == Aspect.RedFlashing ||
 					poweredAspect == Aspect.YellowFlashing))
@@ -541,33 +452,33 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				IBlockState state = world.getBlockState(getSignalHeadPos());
+				IBlockState state = world.getBlockState(getPos());
 				
 				if (!(state.getBlock() instanceof BlockSignalHead))
 				{
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (poweredAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 
-				world.setBlockState(getSignalHeadPos(), state);
+				world.setBlockState(getPos(), state);
 				
 				flashTimer = 0;
 			}
@@ -581,40 +492,40 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				IBlockState state = world.getBlockState(getSignalHeadPos());
+				IBlockState state = world.getBlockState(getPos());
 				
 				if (!(state.getBlock() instanceof BlockSignalHead))
 				{
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (unpoweredAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 				
-				world.setBlockState(getSignalHeadPos(), state);
+				world.setBlockState(getPos(), state);
 				
 				flashTimer = 0;
 			}
 		}
 		else if (mode == Mode.Occupation)
 		{
-			IBlockState state = world.getBlockState(getSignalHeadPos());
+			IBlockState state = world.getBlockState(getPos());
 			
 			if (!(state.getBlock() instanceof BlockSignalHead))
 			{
@@ -630,50 +541,50 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 					return;
 				}
 				
-				if (state.getValue(BlockSignalHead.ASPECT) == BlockSignalHead.Aspect.Dark)
+				if (state.getValue(BlockSignalHead.ASPECT) == EnumAspect.Dark)
 				{
-					BlockSignalHead.Aspect newAspect;
+					EnumAspect newAspect;
 					if (occupationAspect == Aspect.RedFlashing)
 					{
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 					}
 					else
 					{
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 					}
 					
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
 				}
 				else
 				{
-					state = state.withProperty(BlockSignalHead.ASPECT, BlockSignalHead.Aspect.Dark);
+					state = state.withProperty(BlockSignalHead.ASPECT, EnumAspect.Dark);
 				}
 				
-				world.setBlockState(getSignalHeadPos(), state);
+				world.setBlockState(getPos(), state);
 				
 				flashTimer = 0;
 			}
 			else
 			{
-				BlockSignalHead.Aspect newAspect = BlockSignalHead.Aspect.Dark;
+				EnumAspect newAspect = EnumAspect.Dark;
 				
 				switch(occupationAspect)
 				{
 					case Red:
-						newAspect = BlockSignalHead.Aspect.Red;
+						newAspect = EnumAspect.Red;
 						break;
 					case Yellow:
-						newAspect = BlockSignalHead.Aspect.Yellow;
+						newAspect = EnumAspect.Yellow;
 						break;
 					case Green:
-						newAspect = BlockSignalHead.Aspect.Green;
+						newAspect = EnumAspect.Green;
 						break;
 				}
 				
 				if (state.getValue(BlockSignalHead.ASPECT) != newAspect)
 				{
 					state = state.withProperty(BlockSignalHead.ASPECT, newAspect);
-					world.setBlockState(getSignalHeadPos(), state);
+					world.setBlockState(getPos(), state);
 				}
 			}
 		}
@@ -723,7 +634,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	}
 	
 	private void doNormalTick()
-	{
+	{		
 		if (registeredEndPoint == null)
 		{
 			if (occupationAspect != occupationAspect.Dark)
@@ -737,7 +648,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		
 		if (blocksTraveled == 0)
 		{
-			EnumFacing signalFacing = world.getBlockState(getSignalHeadPos()).getValue(BlockSignalHead.FACING);
+			EnumFacing signalFacing = world.getBlockState(getPos()).getValue(BlockSignalHead.FACING);
 			BlockPos current = new BlockPos(occupationOriginX, occupationOriginY, occupationOriginZ);
 			BlockPos motionBP = current.offset(signalFacing);
 			
@@ -781,9 +692,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 				if (masterTE instanceof SignalTileEntity)
 				{
 					SignalTileEntity masterTESignal = (SignalTileEntity)masterTE;
-					BlockPos signalHeadPos = masterTESignal.getMaster(world).getSignalHeadPos();
-					IBlockState signalHead = world.getBlockState(signalHeadPos);
-					IBlockState thisSignalHead = world.getBlockState(getSignalHeadPos());
 					
 					switch(masterTESignal.getOccupationAspect())
 					{
@@ -805,7 +713,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 
 					lastTickTimedOut = false;
 					markDirty();
-					notifyUpdate();
 					lastLocation = null;
 					blocksTraveled = 0;
 					break;
@@ -841,17 +748,12 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			lastLocation = nextLocation;
 		}
 	}
-		
-	private BlockPos getSignalHeadPos()
-	{
-		return new BlockPos(signalHeadX, signalHeadY, signalHeadZ);
-	}
 
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
 		Block newBlock = newSate.getBlock();
 		
-		if (newBlock instanceof BlockMast || newBlock instanceof BlockMastFake || newBlock instanceof BlockSignalHead)
+		if (newBlock instanceof BlockSignalHead)
 		{
 			return false;
 		}
@@ -859,34 +761,33 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		return true;
 	}
 
-	public void onNeighborChanged(World world)
-	{
-		boolean powered = world.isBlockPowered(getPos());
-		
-		if ((powered &&
+	public void onNeighborChanged(World world, boolean isPowered)
+	{		
+		if ((isPowered &&
 				(poweredAspect == Aspect.RedFlashing ||
 				poweredAspect == Aspect.YellowFlashing))
-			|| (!powered &&
+			|| (!isPowered &&
 				(unpoweredAspect == Aspect.RedFlashing ||
-				unpoweredAspect == Aspect.YellowFlashing)))
+				unpoweredAspect == Aspect.YellowFlashing))
+			|| mode == Mode.Occupation)
 		{
 			// Will be picked up by tick
 			return;
 		}
 		
-		BlockSignalHead.Aspect aspect = BlockSignalHead.Aspect.Dark;
-		if (powered)
+		EnumAspect aspect = EnumAspect.Dark;
+		if (isPowered)
 		{
 			switch(poweredAspect)
 			{
 				case Red:
-					aspect = BlockSignalHead.Aspect.Red;
+					aspect = EnumAspect.Red;
 					break;
 				case Yellow:
-					aspect = BlockSignalHead.Aspect.Yellow;
+					aspect = EnumAspect.Yellow;
 					break;
 				case Green:
-					aspect = BlockSignalHead.Aspect.Green;
+					aspect = EnumAspect.Green;
 					break;
 			}
 		}
@@ -895,18 +796,18 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			switch(unpoweredAspect)
 			{
 				case Red:
-					aspect = BlockSignalHead.Aspect.Red;
+					aspect = EnumAspect.Red;
 					break;
 				case Yellow:
-					aspect = BlockSignalHead.Aspect.Yellow;
+					aspect = EnumAspect.Yellow;
 					break;
 				case Green:
-					aspect = BlockSignalHead.Aspect.Green;
+					aspect = EnumAspect.Green;
 					break;
 			}
 		}
 		
-		IBlockState signalState = world.getBlockState(getSignalHeadPos());
+		IBlockState signalState = world.getBlockState(getPos());
 		
 		if (!(signalState.getBlock() instanceof BlockSignalHead))
 		{
@@ -915,7 +816,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		
 		signalState = signalState.withProperty(BlockSignalHead.ASPECT, aspect);
 		
-		world.setBlockState(getSignalHeadPos(), signalState);
+		world.setBlockState(getPos(), signalState);
 	}
 
 	public void setMode(Mode mode)
@@ -995,5 +896,15 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		}
 		
 		return 0xFFFFFF;
+	}
+
+	public void setOccupationOrigin(BlockPos newPos)
+	{
+		occupationOriginX = newPos.getX();
+		occupationOriginY = newPos.getY();
+		occupationOriginZ = newPos.getZ();
+		
+		markDirty();
+		notifyUpdate();
 	}
 }

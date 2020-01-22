@@ -6,6 +6,7 @@ import com.clussmanproductions.railstuff.proxy.CommonProxy;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -21,13 +22,13 @@ public class ModRailStuff
 {
     public static final String MODID = "railstuff";
     public static final String NAME = "RailStuff";
-    public static final String VERSION = "0.0.5";
+    public static final String VERSION = "0.2.0";
     public static boolean IR_INSTALLED = false;
     public static CreativeTabs CREATIVE_TAB = new CreativeTabs("RailStuff") {
 		
 		@Override
 		public ItemStack getTabIconItem() {
-			return new ItemStack(ModItems.signal);
+			return new ItemStack(Item.getItemFromBlock(ModBlocks.signal_head), 1, 0);
 		}
 	};
 	

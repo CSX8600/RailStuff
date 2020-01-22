@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.data.RollingStockIdentificationData;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketHandler;
+import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -19,7 +21,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -79,42 +85,36 @@ public class EntityIdentifierRenderer {
 	@SubscribeEvent
 	public static void renderWorldEvent(RenderWorldLastEvent e)
 	{
+		if (!ModRailStuff.IR_INSTALLED)
+		{
+			return;
+		}
+		
 		ItemStack heldItem = Minecraft.getMinecraft().player.inventory.getCurrentItem();
 		if (heldItem == null || !(heldItem.getItem() instanceof ItemPaperwork))
 		{
 			return;
 		}
-		
-		Class rollingStockClass = null;
-		try {
-			rollingStockClass = Class.forName("cam72cam.immersiverailroading.entity.EntityRollingStock");
-		} catch (ClassNotFoundException e1) {
-			return;
-		}
-		List<Entity> entities = Minecraft.getMinecraft().world.getLoadedEntityList();
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(Minecraft.getMinecraft().world);
 		
-		for(Entity entity : entities)
+		Entity viewEntity = Minecraft.getMinecraft().getRenderManager().renderViewEntity;
+		for(Entity entity : ImmersiveRailroadingHelper.getLoadedIRStock(Minecraft.getMinecraft().world))
 		{
-			if (!rollingStockClass.isAssignableFrom(entity.getClass()))
-			{
-				continue;
-			}
 			String name = data.getIdentifierByUUID(entity.getPersistentID());
 			if (name.equals(""))
 			{
 				continue;
 			}
 			
-			double x = interpolateValue(entity.prevPosX, entity.posX, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posX;
-			double y = interpolateValue(entity.prevPosY, entity.posY, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posY;
-			double z = interpolateValue(entity.prevPosZ, entity.posZ, e.getPartialTicks()) - Minecraft.getMinecraft().getRenderManager().renderViewEntity.posZ;
+			double x = i(entity.lastTickPosX, entity.posX, e.getPartialTicks()) - i(viewEntity.lastTickPosX, viewEntity.posX, e.getPartialTicks());
+			double y = i(entity.lastTickPosY, entity.posY, e.getPartialTicks()) - i(viewEntity.lastTickPosY, viewEntity.posY, e.getPartialTicks());
+			double z = i(entity.lastTickPosZ, entity.posZ, e.getPartialTicks()) - i(viewEntity.lastTickPosZ, viewEntity.posZ, e.getPartialTicks());
 						
 			renderNameTag(entity, (float)x, (float)y, (float)z, Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderManager().getFontRenderer(), name);
 		}
 	}
 	
-	private static double interpolateValue(double start, double end, double pct)
+	private static double i(double start, double end, double pct)
     {
         return start + (end - start) * pct;
     }
@@ -122,35 +122,9 @@ public class EntityIdentifierRenderer {
 	@SubscribeEvent
 	public static void playerInteract(PlayerInteractEvent.EntityInteract e)
 	{
-		Class rollingStockClass = null;
-		try {
-			rollingStockClass = Class.forName("cam72cam.immersiverailroading.entity.EntityRollingStock");
-		} catch (ClassNotFoundException e1) {
-			return;
-		}
-		
-		if (!rollingStockClass.isAssignableFrom(e.getTarget().getClass()))
+		if (ModRailStuff.IR_INSTALLED)
 		{
-			return;
+			ImmersiveRailroadingHelper.handlePlayerInteract(e);
 		}
-		
-		if (!(e.getEntityPlayer().inventory.getCurrentItem().getItem() instanceof ItemRollingStockAssigner))
-		{
-			return;
-		}
-		
-		e.setCanceled(true);
-		Entity entity = e.getTarget();
-		int x = (int)Math.floor(entity.posX);
-		int y = (int)Math.floor(entity.posY);
-		int z = (int)Math.floor(entity.posZ);
-		
-		PacketGetIdentifierForAssignGUI packet = new PacketGetIdentifierForAssignGUI();
-		packet.id = entity.getPersistentID();
-		packet.x = x;
-		packet.y = y;
-		packet.z = z;
-		
-		PacketHandler.INSTANCE.sendToServer(packet);
 	}
 }

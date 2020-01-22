@@ -1,32 +1,33 @@
 package com.clussmanproductions.railstuff.blocks;
 
-import com.clussmanproductions.railstuff.ModBlocks;
-import com.clussmanproductions.railstuff.ModItems;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.model.BlockFacing;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
+import com.clussmanproductions.railstuff.item.ItemSignalSurveyor;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
+import com.clussmanproductions.railstuff.util.EnumAspect;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 
 public class BlockSignalHead extends BlockFacing implements ITileEntityProvider {
-	public static PropertyEnum<Aspect> ASPECT = PropertyEnum.create("aspect", Aspect.class);
+	public static PropertyEnum<EnumAspect> ASPECT = PropertyEnum.create("aspect", EnumAspect.class);
 	
 	public BlockSignalHead()
 	{
@@ -34,6 +35,12 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 		setRegistryName("signal_head");
 		setUnlocalizedName(ModRailStuff.MODID + ".signal_head");
 		setHardness(2f);
+		setCreativeTab(ModRailStuff.CREATIVE_TAB);
+	}
+	
+	public void initModel()
+	{
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
 	}
 	
 	@Override
@@ -54,26 +61,6 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalTileEntity();
-	}	
-	
-	@Override
-	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		SignalTileEntity te = (SignalTileEntity)worldIn.getTileEntity(pos);
-		if (te == null)
-		{
-			super.breakBlock(worldIn, pos, state);
-			return;
-		}
-		
-		SignalTileEntity master = te.getMaster(worldIn);
-		if (master == null)
-		{
-			super.breakBlock(worldIn, pos, state);
-			return;
-		}
-		
-		master.onBreak(worldIn);
-		super.breakBlock(worldIn, pos, state);
 	}
 	
 	@Override
@@ -93,40 +80,6 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 		}
 	}
 
-	public enum Aspect implements IStringSerializable
-	{
-		Red("red", 1),
-		Yellow("yellow", 2),
-		Green("green", 3),
-		Dark("dark", 4); 
-		
-		private String name;
-		private int index;
-		Aspect(String name, int index)
-		{
-			this.name = name;
-			this.index = index;
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-		
-		public Aspect getAspect(int index)
-		{
-			for(Aspect aspect : Aspect.values())
-			{
-				if (aspect.index == index)
-				{
-					return aspect;
-				}
-			}
-			
-			return null;
-		}
-	}
-	
 	@Override
 	public int getMetaFromState(IBlockState state) {
 		int baseMeta = super.getMetaFromState(state);
@@ -159,20 +112,20 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 			workingMeta -= 4;
 		};
 		
-		Aspect aspect;
+		EnumAspect aspect;
 		switch(iterationTimes)
 		{
 			case 3:
-				aspect = Aspect.Red;
+				aspect = EnumAspect.Red;
 				break;
 			case 2:
-				aspect = Aspect.Yellow;
+				aspect = EnumAspect.Yellow;
 				break;
 			case 1:
-				aspect = Aspect.Green;
+				aspect = EnumAspect.Green;
 				break;
 			default:
-				aspect = Aspect.Dark;
+				aspect = EnumAspect.Dark;
 				break;
 		}
 		
@@ -183,16 +136,24 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
-			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {		
-		SignalTileEntity te = (SignalTileEntity)worldIn.getTileEntity(pos);
-		IBlockState masterState = worldIn.getBlockState(te.getMaster(worldIn).getPos());
+			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (!worldIn.isRemote)
+		{
+			return !(playerIn.inventory.getCurrentItem().getItem() instanceof ItemSignalSurveyor);
+		}
 		
-		return ModBlocks.mast.onBlockActivated(worldIn, te.getPos(), masterState, playerIn, hand, facing, hitX, hitY, hitZ);
+		if (playerIn.inventory.getCurrentItem().getItem() instanceof ItemSignalSurveyor)
+		{
+			return false;
+		}
+		
+		playerIn.openGui(ModRailStuff.instance, GuiProxy.GuiIDs.SIGNAL, worldIn, pos.getX(), pos.getY(), pos.getZ());
+		return true;
 	}
 	
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-		if (state.getValue(ASPECT) == Aspect.Dark)
+		if (state.getValue(ASPECT) == EnumAspect.Dark)
 		{
 			return 0;
 		}
@@ -211,8 +172,18 @@ public class BlockSignalHead extends BlockFacing implements ITileEntityProvider 
 	}
 
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
-			EntityPlayer player) {
-		return new ItemStack(ModItems.signal);
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
+			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing());
+	}
+	
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		if (face == state.getValue(FACING))
+		{
+			return BlockFaceShape.SOLID;
+		}
+		
+		return BlockFaceShape.UNDEFINED;
 	}
 }

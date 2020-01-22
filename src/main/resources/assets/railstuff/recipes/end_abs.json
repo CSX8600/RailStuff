@@ -1,0 +1,28 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    " I ",
+    " R "  ],
+  "key": {
+    "I":
+    {
+        "type": "forge:ore_dict",
+        "ore": "ingotIron"
+    },
+    "W":
+    {
+        "item": "minecraft:wool",
+        "data": 0
+    },
+    "R":
+    {
+    	"type": "forge:ore_dict",
+    	"ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "railstuff:end_abs",
+    "count": 1
+  }
+}

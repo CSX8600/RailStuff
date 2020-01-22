@@ -1,7 +1,11 @@
 package com.clussmanproductions.railstuff.item;
 
+import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.BlockEndABS;
+import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.network.PacketHandler;
+import com.clussmanproductions.railstuff.network.PacketSetSignalOccupationOriginOnServer;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
@@ -42,29 +46,67 @@ public class ItemSignalSurveyor extends Item {
 			return EnumActionResult.SUCCESS;
 		}
 		
-		SignalTileEntity te = (SignalTileEntity)worldIn.getTileEntity(pos);
-		
-		if (te != null)
+		if (worldIn.getBlockState(pos).getBlock() == ModBlocks.signal_head)
 		{
-			return pairToSignal(worldIn, te, player);
+			SignalTileEntity te = (SignalTileEntity)worldIn.getTileEntity(pos);
+			
+			if (te != null)
+			{
+				return pairToSignal(worldIn, te, player);
+			}
 		}
 		
 		IBlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() instanceof BlockEndABS)
 		{
 			return pairToSign(worldIn, pos, player);
-		}		
+		}
+		
+		if (ModRailStuff.IR_INSTALLED)
+		{
+			EnumActionResult res = ImmersiveRailroadingHelper.handleSignalCustomOrigin(() -> setOccupationOrigin(worldIn, pos, player), pos, worldIn);
+			if (res != null)
+			{
+				return res;
+			}
+		}
 		
 		return EnumActionResult.PASS;
 	}
 
 	private EnumActionResult pairToSignal(World worldIn, SignalTileEntity te, EntityPlayer player)
-	{
-		te = te.getMaster(worldIn);
-		
+	{		
 		NBTTagCompound tag = getTagOfSurveyor(player);
 		
-		int[] pairingpos = null;
+		int[] pairingpos = null;		
+		if (player.isSneaking())
+		{
+			if (tag.hasKey("pairingpos"))
+			{
+				tag.removeTag("pairingpos");;
+				player.sendMessage(new TextComponentString("Unpaired from Signal"));
+			}
+			
+
+			if (tag.hasKey("occupationpairingpos"))
+			{
+				tag.removeTag("occupationpairingpos");
+				player.sendMessage(new TextComponentString("Stopped setting occupation origin"));
+			}
+			else
+			{
+				tag.setIntArray("occupationpairingpos", new int[] { te.getPos().getX(), te.getPos().getY(), te.getPos().getZ() });
+				player.sendMessage(new TextComponentString("Starting setting occupation origin"));
+			}
+			return EnumActionResult.SUCCESS;
+		}
+		
+		if (tag.hasKey("occupationpairingpos"))
+		{
+			tag.removeTag("occupationpairingpos");
+			player.sendMessage(new TextComponentString("Stopped setting occupation origin"));
+		}
+		
 		if (tag.hasKey("pairingpos"))
 		{
 			pairingpos = tag.getIntArray("pairingpos");
@@ -137,12 +179,40 @@ public class ItemSignalSurveyor extends Item {
 		return EnumActionResult.SUCCESS;
 	}
 	
+	private EnumActionResult setOccupationOrigin(World worldIn, BlockPos pos, EntityPlayer player)
+	{
+		NBTTagCompound tag = getTagOfSurveyor(player);
+		
+		if (tag.hasKey("pairingpos"))
+		{
+			tag.removeTag("pairingpos");
+			player.sendMessage(new TextComponentString("Stopped pairing with signal"));
+		}
+		
+		int[] pairingposarray = tag.getIntArray("occupationpairingpos");
+		BlockPos pairingpos = new BlockPos(pairingposarray[0], pairingposarray[1], pairingposarray[2]);
+		IBlockState signalState = worldIn.getBlockState(pairingpos);		
+		Vec3d trackPos = ImmersiveRailroadingHelper.findOrigin(pos, signalState.getValue(BlockSignalHead.FACING), worldIn);
+		BlockPos originPos = new BlockPos(trackPos.x, trackPos.y, trackPos.z);
+		
+		PacketSetSignalOccupationOriginOnServer packet = new PacketSetSignalOccupationOriginOnServer();
+		packet.newPosition = originPos;
+		packet.tePos = pairingpos;
+		PacketHandler.INSTANCE.sendToServer(packet);
+		
+		player.sendMessage(new TextComponentString("Set origin!  Clearing"));
+		tag.removeTag("occupationpairingpos");
+		
+		return EnumActionResult.SUCCESS;
+	}
+	
 	private NBTTagCompound getTagOfSurveyor(EntityPlayer player)
 	{
 		NBTTagCompound tag = player.inventory.getCurrentItem().getTagCompound();
 		if (tag == null)
 		{
 			tag = new NBTTagCompound();
+			player.inventory.getCurrentItem().setTagCompound(tag);
 		}
 		
 		return tag;
