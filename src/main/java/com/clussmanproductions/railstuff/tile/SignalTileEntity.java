@@ -1,13 +1,22 @@
 package com.clussmanproductions.railstuff.tile;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 import com.clussmanproductions.railstuff.Config;
 import com.clussmanproductions.railstuff.ModBlocks;
 import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.blocks.BlockEndABS;
 import com.clussmanproductions.railstuff.blocks.BlockMast;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
+import com.clussmanproductions.railstuff.scanner.IScannerSubscriber;
+import com.clussmanproductions.railstuff.scanner.ScanCompleteData;
+import com.clussmanproductions.railstuff.scanner.ScanRequest;
+import com.clussmanproductions.railstuff.scanner.ScannerThread;
 import com.clussmanproductions.railstuff.util.EnumAspect;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -27,7 +36,7 @@ import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
 import scala.Tuple3;
 
-public class SignalTileEntity extends TileEntitySyncable implements ITickable {
+public class SignalTileEntity extends TileEntitySyncable implements ITickable, IScannerSubscriber {
 
 	private Mode mode = Mode.Manual;
 	private Aspect unpoweredAspect = Aspect.Dark;
@@ -40,15 +49,9 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 	private double occupationOriginX = 0;
 	private double occupationOriginY = -1;
 	private double occupationOriginZ = 0;
-	private int blocksTraveled = 0;
-	private Vec3d lastLocation;
-	private double lastMotionX = 0;
-	private double lastMotionY = 0;
-	private double lastMotionZ = 0;
 	private Tuple3</*RailPoint*/BlockPos, /*TE Point*/BlockPos, String> registeredEndPoint;
 	private LastSwitchInfo lastSwitchInfo = new LastSwitchInfo();
 	private Aspect occupationAspect = Aspect.Red;
-	private Ticket lastTicket;
 	private final String NO_ORIGIN = "No track found nearby";
 	private final String NO_PAIR = "Not paired";
 	private final String OK = "Normal";
@@ -359,6 +362,8 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			return;
 		}
 		
+		ScannerThread.ThreadsByWorld.get(world).subscribe(this);
+		
 		if (!hasUpdatedBlockState && mode == Mode.Manual)
 		{
 			boolean powered = world.isBlockPowered(getPos());
@@ -406,22 +411,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		}
 		
 		performFlash();
-		
-		if (mode == Mode.Occupation && ModRailStuff.IR_INSTALLED)
-		{			
-			if (occupationOriginY == -1)
-			{
-				setOccupationOrigin();
-				
-				if (occupationOriginY == -1)
-				{
-					registeredEndPoint = null;
-					return;
-				}
-			}
-			
-			doNormalTick();
-		}
 	}
 
 	private void performFlash()
@@ -589,166 +578,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 			}
 		}
 	}
-	
-	private boolean doChunkLoad(BlockPos nextPos)
-	{
-		Chunk chunk = world.getChunkFromBlockCoords(nextPos);
-		if (!chunk.isLoaded())
-		{
-			if (lastTicket != null)
-			{
-				ChunkPos lastChunkPos = null;
-				for(ChunkPos pos : lastTicket.getChunkList())
-				{
-					lastChunkPos = pos;
-					break;
-				}
-				
-				ForgeChunkManager.unforceChunk(lastTicket, lastChunkPos);
-				ForgeChunkManager.releaseTicket(lastTicket);
-			}
-			
-			lastTicket = ForgeChunkManager.requestTicket(ModRailStuff.instance, world, Type.NORMAL);
-			if (lastTicket == null)
-			{
-				ModRailStuff.logger.error("Signal failed to load chunk during tick - maybe there are too many signals?");
-				return false;
-			}
-			
-			ForgeChunkManager.forceChunk(lastTicket, new ChunkPos(chunk.x, chunk.z));
-		}
-		else if (lastTicket != null && !lastTicket.getChunkList().contains(new ChunkPos(chunk.x, chunk.z)))
-		{
-			ChunkPos lastChunkPos = null;
-			for(ChunkPos pos : lastTicket.getChunkList())
-			{
-				lastChunkPos = pos;
-				break;
-			}
-			
-			ForgeChunkManager.unforceChunk(lastTicket, lastChunkPos);
-			ForgeChunkManager.releaseTicket(lastTicket);
-		}
 		
-		return true;
-	}
-	
-	private void doNormalTick()
-	{		
-		if (registeredEndPoint == null)
-		{
-			if (occupationAspect != occupationAspect.Dark)
-			{
-				occupationAspect = occupationAspect.Dark;
-				markDirty();
-				notifyUpdate();
-			}
-			return;
-		}
-		
-		if (blocksTraveled == 0)
-		{
-			EnumFacing signalFacing = world.getBlockState(getPos()).getValue(BlockSignalHead.FACING);
-			BlockPos current = new BlockPos(occupationOriginX, occupationOriginY, occupationOriginZ);
-			BlockPos motionBP = current.offset(signalFacing);
-			
-			lastMotionX = motionBP.getX() - current.getX();
-			lastMotionY = motionBP.getY() - current.getY();
-			lastMotionZ = motionBP.getZ() - current.getZ();
-		}
-		
-		for(int i = 0; i < Config.signalDistanceTick; i++)
-		{
-			if (lastLocation == null)
-			{
-				lastLocation = new Vec3d(occupationOriginX, occupationOriginY, occupationOriginZ);
-			}
-			
-			Vec3d motion = new Vec3d(lastMotionX, lastMotionY, lastMotionZ);
-			
-			Vec3d nextLocation = ImmersiveRailroadingHelper.getNextPosition(lastLocation, motion, world, lastSwitchInfo);
-			
-			if (!doChunkLoad(new BlockPos(nextLocation.x, nextLocation.y, nextLocation.z)))
-			{
-				lastLocation = null;
-				blocksTraveled = 0;
-				break;
-			}
-			
-			if (ImmersiveRailroadingHelper.hasStockNearby(new Vec3d(occupationOriginX, occupationOriginY, occupationOriginZ), world) || ImmersiveRailroadingHelper.hasStockNearby(nextLocation, world))
-			{
-				occupationAspect = Aspect.Red;
-				lastTickTimedOut = false;
-				markDirty();
-				notifyUpdate();
-				
-				lastLocation = null;
-				blocksTraveled = 0;
-				break;
-			}
-			else if (registeredEndPoint._1().equals(new BlockPos(nextLocation.x, nextLocation.y, nextLocation.z)))
-			{				
-				TileEntity masterTE = (TileEntity)world.getTileEntity(registeredEndPoint._2());
-				if (masterTE instanceof SignalTileEntity)
-				{
-					SignalTileEntity masterTESignal = (SignalTileEntity)masterTE;
-					
-					switch(masterTESignal.getOccupationAspect())
-					{
-						case Dark:
-						case Red:
-							occupationAspect = Aspect.Yellow;
-							break;
-						case Yellow:
-							occupationAspect = Aspect.YellowFlashing;
-							break;
-						case YellowFlashing:
-						case Green:
-							occupationAspect = Aspect.Green;
-							break;
-						default:
-							occupationAspect = Aspect.Red;
-							break;
-					}
-
-					lastTickTimedOut = false;
-					markDirty();
-					lastLocation = null;
-					blocksTraveled = 0;
-					break;
-				}
-				else if (world.getBlockState(registeredEndPoint._2()).getBlock() instanceof BlockEndABS)
-				{
-					occupationAspect = Aspect.Yellow;
-					lastTickTimedOut = false;
-					markDirty();
-					notifyUpdate();
-					lastLocation = null;
-					blocksTraveled = 0;
-					break;
-				}
-			}
-			
-			lastMotionX = nextLocation.x - lastLocation.x;
-			lastMotionY = nextLocation.y - lastLocation.y;
-			lastMotionZ = nextLocation.z - lastLocation.z;
-			
-			blocksTraveled++;
-			if (blocksTraveled >= Config.signalDistanceTimeout || nextLocation == lastLocation)
-			{
-				occupationAspect = Aspect.Red;
-				lastTickTimedOut = true;
-				markDirty();
-				notifyUpdate();
-				lastLocation = null;
-				blocksTraveled = 0;
-				break;
-			}
-			
-			lastLocation = nextLocation;
-		}
-	}
-
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
 		Block newBlock = newSate.getBlock();
@@ -906,5 +736,76 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable {
 		
 		markDirty();
 		notifyUpdate();
+	}
+
+	@Override
+	public List<ScanRequest> getScanRequests() {
+		if (occupationOriginY == -1)
+		{
+			setOccupationOrigin();
+		}
+		
+		if (!isInvalid() && occupationOriginY != -1 && registeredEndPoint != null)
+		{
+			return ImmutableList.<ScanRequest>of(new ScanRequest(
+					UUID.fromString("22be8342-bf97-413b-9d82-81532ac5ce46"),
+					getOccupationOriginBlockPos(),
+					registeredEndPoint._1(),
+					world.getBlockState(getPos()).getValue(BlockSignalHead.FACING)));
+		}
+		
+		return Collections.EMPTY_LIST;
+	}
+
+	@Override
+	public void onScanComplete(ScanCompleteData scanCompleteData) {
+		if (scanCompleteData.getTimedOut())
+		{
+			lastTickTimedOut = true;
+			occupationAspect = Aspect.Red;
+			markDirty();
+			return;
+		}
+		
+		lastTickTimedOut = false;
+		
+		if (scanCompleteData.getTrainFound())
+		{
+			occupationAspect = Aspect.Red;
+			markDirty();
+		}
+		else
+		{
+			TileEntity masterTE = (TileEntity)world.getTileEntity(registeredEndPoint._2());
+			if (masterTE instanceof SignalTileEntity)
+			{
+				SignalTileEntity masterTESignal = (SignalTileEntity)masterTE;
+				
+				switch(masterTESignal.getOccupationAspect())
+				{
+					case Dark:
+					case Red:
+						occupationAspect = Aspect.Yellow;
+						break;
+					case Yellow:
+						occupationAspect = Aspect.YellowFlashing;
+						break;
+					case YellowFlashing:
+					case Green:
+						occupationAspect = Aspect.Green;
+						break;
+					default:
+						occupationAspect = Aspect.Red;
+						break;
+				}
+				
+				markDirty();
+			}
+			else if (world.getBlockState(registeredEndPoint._2()).getBlock() instanceof BlockEndABS)
+			{
+				occupationAspect = Aspect.Yellow;
+				markDirty();
+			}
+		}
 	}
 }

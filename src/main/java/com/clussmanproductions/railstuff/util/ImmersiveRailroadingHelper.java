@@ -193,7 +193,7 @@ public class ImmersiveRailroadingHelper {
 		return te.getNextPosition(currentPosition, motion);
 	}
 	
-	public static boolean hasStockNearby(Vec3d currentPosition, World world)
+	public static List<EntityMoveableRollingStock> hasStockNearby(Vec3d currentPosition, World world)
 	{
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
 
@@ -204,7 +204,7 @@ public class ImmersiveRailroadingHelper {
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 
-		return !stocks.isEmpty();
+		return (List<EntityMoveableRollingStock>)stocks;
 	}
 
 	public static void handlePlayerInteract(PlayerInteractEvent.EntityInteract e)
