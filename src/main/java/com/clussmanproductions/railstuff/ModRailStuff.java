@@ -22,7 +22,7 @@ public class ModRailStuff
 {
     public static final String MODID = "railstuff";
     public static final String NAME = "RailStuff";
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.2b";
     public static boolean IR_INSTALLED = false;
     public static CreativeTabs CREATIVE_TAB = new CreativeTabs("RailStuff") {
 		

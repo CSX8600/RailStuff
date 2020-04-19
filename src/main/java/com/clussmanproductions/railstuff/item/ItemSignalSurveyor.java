@@ -194,11 +194,8 @@ public class ItemSignalSurveyor extends Item {
 		IBlockState signalState = worldIn.getBlockState(pairingpos);		
 		Vec3d trackPos = ImmersiveRailroadingHelper.findOrigin(pos, signalState.getValue(BlockSignalHead.FACING), worldIn);
 		BlockPos originPos = new BlockPos(trackPos.x, trackPos.y, trackPos.z);
-		
-		PacketSetSignalOccupationOriginOnServer packet = new PacketSetSignalOccupationOriginOnServer();
-		packet.newPosition = originPos;
-		packet.tePos = pairingpos;
-		PacketHandler.INSTANCE.sendToServer(packet);
+		SignalTileEntity signalTE = (SignalTileEntity)worldIn.getTileEntity(pairingpos);
+		signalTE.setOccupationOrigin(originPos);
 		
 		player.sendMessage(new TextComponentString("Set origin!  Clearing"));
 		tag.removeTag("occupationpairingpos");

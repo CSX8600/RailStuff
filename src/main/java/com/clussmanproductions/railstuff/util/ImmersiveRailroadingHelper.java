@@ -3,6 +3,7 @@ package com.clussmanproductions.railstuff.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.clussmanproductions.railstuff.ModRailStuff;
@@ -13,6 +14,7 @@ import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.entity.EntityRollingStock;
@@ -124,7 +126,7 @@ public class ImmersiveRailroadingHelper {
 			
 			TileRail switchTile;
 			try
-			{
+			{			
 				switchTile = currentRailBase.findSwitchParent(currentRailBase);
 			}
 			catch(Exception ex)
@@ -166,7 +168,8 @@ public class ImmersiveRailroadingHelper {
 							return currentPosition;
 						}
 						
-						TileRail placementTileEntity = ((TileRailBase)((TileEntity)placementITrack).instance()).getParentTile();
+						TileRailBase placementRailBase = (TileRailBase)((TileEntity)placementITrack).instance();						
+						TileRail placementTileEntity = placementRailBase.getParentTile();
 						
 						if((placementTileEntity.info.switchState == SwitchState.STRAIGHT && !isOnStraight) ||
 							(placementTileEntity.info.switchState == SwitchState.TURN && isOnStraight))
@@ -197,11 +200,14 @@ public class ImmersiveRailroadingHelper {
 	{
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
 
-		AxisAlignedBB bb = new AxisAlignedBB(currentBlockPos.south().west(), currentBlockPos.up(3).east().north());
-		List<EntityMoveableRollingStock> stocks = world.getEntitiesWithinAABB(ModdedEntity.class, bb)
+		AxisAlignedBB bb = new AxisAlignedBB(currentBlockPos.down(2).south(2).west(2), currentBlockPos.up(2).east(2).north(2));
+		List<EntityMoveableRollingStock> stocks = ImmutableList.copyOf(world.loadedEntityList)
 				.stream()
+				.map(x -> x instanceof ModdedEntity ? (ModdedEntity)x : null)
+				.filter(Objects::nonNull)
 				.map(x -> x.getSelf() instanceof EntityMoveableRollingStock ? (EntityMoveableRollingStock)x.getSelf() : null)
 				.filter(Objects::nonNull)
+				.filter(emrs -> bb.contains(new Vec3d(emrs.getBlockPosition().internal)))
 				.collect(Collectors.toList());
 
 		return (List<EntityMoveableRollingStock>)stocks;

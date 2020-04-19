@@ -1,18 +1,28 @@
 package com.clussmanproductions.railstuff.scanner;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.clussmanproductions.railstuff.Config;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity.LastSwitchInfo;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
+import com.clussmanproductions.railstuff.util.Tuple;
+import com.google.common.collect.ImmutableList;
 
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
+import cam72cam.immersiverailroading.tile.TileRailBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.ChunkProviderServer;
+import trackapi.lib.ITrack;
+import trackapi.lib.Util;
 
 public class ScannerThread extends Thread
 {
@@ -48,48 +58,58 @@ public class ScannerThread extends Thread
 		
 		while(true)
 		{
-			if (_stop)
+			try
 			{
-				return;
-			}
-			
-			for(BlockPos pos : _data.getSubscribers())
-			{
-				if (!_world.isBlockLoaded(pos))
+				if (_stop)
 				{
-					continue;
+					return;
 				}
 				
-				TileEntity tileEntity = _world.getTileEntity(pos);
-				if (!(tileEntity instanceof IScannerSubscriber))
+				for(BlockPos pos : _data.getSubscribers())
 				{
-					_data.removeSubscriber(pos);
-					continue;
-				}
-				
-				IScannerSubscriber subscriber = (IScannerSubscriber)tileEntity;
-				for(ScanRequest req : subscriber.getScanRequests())
-				{
-					if (_stop)
-					{
-						return;
-					}
-					
-					ScanCompleteData data = performScan(req);
-					
-					if (_stop)
-					{
-						return;
-					}
-					
 					if (!_world.isBlockLoaded(pos))
 					{
-						break;
+						continue;
 					}
 					
-					subscriber.onScanComplete(data);
+					TileEntity tileEntity = _world.getTileEntity(pos);
+					if (!(tileEntity instanceof IScannerSubscriber))
+					{
+						_data.removeSubscriber(pos);
+						continue;
+					}
+					
+					IScannerSubscriber subscriber = (IScannerSubscriber)tileEntity;
+					for(ScanRequest req : subscriber.getScanRequests())
+					{
+						if (_stop)
+						{
+							return;
+						}
+						
+						ScanCompleteData data = performScan(req);
+						
+						if (_stop)
+						{
+							return;
+						}
+						
+						if (!_world.isBlockLoaded(pos))
+						{
+							break;
+						}
+						
+						subscriber.onScanComplete(data);
+					}
 				}
+				
+				Thread.sleep(500);
 			}
+			catch(InterruptedException ex)
+			{
+				// Okay
+			}
+			catch(Exception ex) {}
 		}
 	}
 	
@@ -124,6 +144,7 @@ public class ScannerThread extends Thread
 								nextPosition.z - currentPosition.z);
 			
 			currentPosition = nextPosition;
+			
 			ScanCompleteData data = checkPosition(req, currentPosition, motion);
 			if (data != null)
 			{
