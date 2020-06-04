@@ -13,7 +13,7 @@ import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.scanner.IScannerSubscriber;
 import com.clussmanproductions.railstuff.scanner.ScanCompleteData;
 import com.clussmanproductions.railstuff.scanner.ScanRequest;
-import com.clussmanproductions.railstuff.scanner.ScannerThread;
+import com.clussmanproductions.railstuff.scanner.Scanner;
 import com.clussmanproductions.railstuff.util.EnumAspect;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 import com.google.common.collect.ImmutableList;
@@ -362,7 +362,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 			return;
 		}
 		
-		ScannerThread.ThreadsByWorld.get(world).subscribe(this);
+		Scanner.ScannersByWorld.get(world).subscribe(this);
 		
 		if (!hasUpdatedBlockState && mode == Mode.Manual)
 		{
