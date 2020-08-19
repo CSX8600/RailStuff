@@ -18,6 +18,7 @@ import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.tile.TileRailBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -234,7 +235,9 @@ public class Scanner
 				return positionCheck;
 			}
 			
-			if (req.getEndingPos().equals(new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z)))
+			AxisAlignedBB boundingBox = new AxisAlignedBB(req.getEndingPos().down().south(2).west(2), req.getEndingPos().up(3).east(2).north(2));
+			
+			if (boundingBox.contains(currentPosition))
 			{
 				return new ScanCompleteData(req, false, false, false);
 			}
