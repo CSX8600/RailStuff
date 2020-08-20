@@ -1,36 +1,25 @@
 package com.clussmanproductions.railstuff.scanner;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.clussmanproductions.railstuff.Config;
-import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity.LastSwitchInfo;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
-import com.clussmanproductions.railstuff.util.Tuple;
 import com.google.common.collect.ImmutableList;
 
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
-import cam72cam.immersiverailroading.tile.TileRailBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.ChunkProviderServer;
-import trackapi.lib.ITrack;
-import trackapi.lib.Util;
 
 public class Scanner
-{	
-	private World _world;
+{
 	private ScannerData _data;
-	public static HashMap<World, Scanner> ScannersByWorld = new HashMap<World, Scanner>();
+	public static HashMap<Integer, Scanner> ScannersByWorld = new HashMap<Integer, Scanner>();
 	
 	private Vec3d lastPosition = null;
 	private Vec3d lastMotion = null;
@@ -43,12 +32,11 @@ public class Scanner
 	public Scanner(World world)
 	{
 		super();
-		_world = world;
-		_data = (ScannerData)_world.loadData(ScannerData.class, "RS_scanner_data");
+		_data = (ScannerData)world.loadData(ScannerData.class, "RS_scanner_data");
 		if (_data == null)
 		{
 			_data = new ScannerData();
-			_world.setData(_data.mapName, _data);
+			world.setData(_data.mapName, _data);
 		}
 	}
 	
@@ -57,7 +45,7 @@ public class Scanner
 		_data.addSubscriber(subscriber.getPos());
 	}
 	
-	public void tick() {
+	public void tick(World world) {
 		try
 		{
 //			for(BlockPos pos : _data.getSubscribers())
@@ -99,7 +87,7 @@ public class Scanner
 				if (lastSubscriber == null)
 				{
 					// Get next first available subscriber
-					lastSubscriber = getNextSubscriber(null);
+					lastSubscriber = getNextSubscriber(null, world);
 				}
 				
 				if (lastSubscriber == null)
@@ -115,7 +103,7 @@ public class Scanner
 				
 				while(lastRequest != null)
 				{
-					ScanCompleteData data = performScan(lastRequest);
+					ScanCompleteData data = performScan(lastRequest, world);
 					
 					if (data == null)
 					{
@@ -141,7 +129,7 @@ public class Scanner
 				
 				if (lastRequest == null)
 				{
-					lastSubscriber = getNextSubscriber(lastSubscriber);
+					lastSubscriber = getNextSubscriber(lastSubscriber, world);
 				}
 				
 				subscribersCheckedThisTick++;
@@ -153,7 +141,7 @@ public class Scanner
 		} 
 	}
 	
-	private IScannerSubscriber getNextSubscriber(IScannerSubscriber lastSubscriber)
+	private IScannerSubscriber getNextSubscriber(IScannerSubscriber lastSubscriber, World world)
 	{
 		ImmutableList<BlockPos> scannerPoses = _data.getSubscribers();
 		if (scannerPoses.size() == 0)
@@ -178,9 +166,9 @@ public class Scanner
 		while(nextIndex != lastIndex)
 		{
 			BlockPos nextPos = scannerPoses.get(nextIndex);
-			if (nextPos != null && _world.isBlockLoaded(nextPos))
+			if (nextPos != null && world.isBlockLoaded(nextPos))
 			{
-				TileEntity teAtPos = _world.getTileEntity(nextPos);
+				TileEntity teAtPos = world.getTileEntity(nextPos);
 				if (teAtPos == null || teAtPos.isInvalid() || !(teAtPos instanceof IScannerSubscriber))
 				{
 					_data.removeSubscriber(nextPos);
@@ -208,7 +196,7 @@ public class Scanner
 		return retVal;
 	}
 	
-	private ScanCompleteData performScan(ScanRequest req)
+	private ScanCompleteData performScan(ScanRequest req, World world)
 	{
 		Vec3d currentPosition = lastPosition != null ? lastPosition : new Vec3d(req.getStartingPos().getX(), req.getStartingPos().getY(), req.getStartingPos().getZ());
 		Vec3d motion = lastMotion != null ? lastMotion : new Vec3d(req.getStartDirection().getDirectionVec());
@@ -216,7 +204,7 @@ public class Scanner
 		
 		while(blocksScannedThisTick < Config.signalDistanceTick)
 		{					
-			Vec3d nextPosition = ImmersiveRailroadingHelper.getNextPosition(currentPosition, motion, _world, lastSwitchInfo);
+			Vec3d nextPosition = ImmersiveRailroadingHelper.getNextPosition(currentPosition, motion, world, lastSwitchInfo);
 			
 			if (nextPosition.equals(currentPosition))
 			{
@@ -229,7 +217,7 @@ public class Scanner
 			
 			currentPosition = nextPosition;
 			
-			ScanCompleteData positionCheck = checkPosition(req, currentPosition, motion);
+			ScanCompleteData positionCheck = checkPosition(req, currentPosition, motion, world);
 			if (positionCheck != null)
 			{
 				return positionCheck;
@@ -257,9 +245,9 @@ public class Scanner
 		return null;
 	}
 	
-	private ScanCompleteData checkPosition(ScanRequest req, Vec3d position, Vec3d motion)
+	private ScanCompleteData checkPosition(ScanRequest req, Vec3d position, Vec3d motion, World world)
 	{
-		List<EntityMoveableRollingStock> moveableRollingStockNearby = ImmersiveRailroadingHelper.hasStockNearby(position, _world);
+		List<EntityMoveableRollingStock> moveableRollingStockNearby = ImmersiveRailroadingHelper.hasStockNearby(position, world);
 		if (!moveableRollingStockNearby.isEmpty())
 		{
 			EntityMoveableRollingStock stock = moveableRollingStockNearby.get(0);
