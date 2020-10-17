@@ -362,7 +362,10 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 			return;
 		}
 		
-		Scanner.ScannersByWorld.get(world.provider.getDimension()).subscribe(this);
+		if (ModRailStuff.IR_INSTALLED)
+		{
+			Scanner.ScannersByWorld.get(world.provider.getDimension()).subscribe(this);
+		}
 		
 		if (!hasUpdatedBlockState && mode == Mode.Manual)
 		{
