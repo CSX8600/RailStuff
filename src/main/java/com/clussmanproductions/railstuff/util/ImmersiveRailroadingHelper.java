@@ -143,7 +143,7 @@ public class ImmersiveRailroadingHelper {
 					// We're in here because this is either the first time we've encountered a switch
 					// or we encountered a new chained-switch.
 					// First, we need to see if we're at the facing point of the switch
-					if (currentPosition.distanceTo(switchTile.info.placementInfo.placementPosition.internal) <= 0.5)
+					if (currentPosition.distanceTo(switchTile.info.placementInfo.placementPosition.internal) <= 0.55)
 					{
 						// We are at the facing point.  Set last placement info
 						// to indicate we've reached it
