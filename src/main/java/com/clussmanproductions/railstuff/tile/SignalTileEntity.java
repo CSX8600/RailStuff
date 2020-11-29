@@ -54,9 +54,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 	private Aspect occupationAspect = Aspect.Red;
 	private final String NO_ORIGIN = "No track found nearby";
 	private final String NO_PAIR = "Not paired";
-	private final String OK = "Normal";
-	private final String TIME_OUT = "Could not find end point";
-	private boolean lastTickTimedOut = false;
+	private String lastScanMessage = "Queued for scan";
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -68,6 +66,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		compound.setDouble("occupationOriginY", occupationOriginY);
 		compound.setDouble("occupationOriginZ", occupationOriginZ);
 		compound.setInteger("occupationAspect", occupationAspect.index);
+		compound.setString("lastScanMessage", lastScanMessage);
 		
 		if (registeredEndPoint != null)
 		{
@@ -92,6 +91,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		occupationOriginY = compound.getInteger("occupationOriginY");
 		occupationOriginZ = compound.getInteger("occupationOriginZ");
 		occupationAspect = Aspect.get(compound.getInteger("occupationAspect"));
+		lastScanMessage = compound.getString("lastScanMessage");
 		
 		int[] endPointArray = null;
 		int[] teArray = null;
@@ -228,7 +228,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		tag.setInteger("poweredAspect", poweredAspect.index);
 		tag.setString("name", name);
 		tag.setDouble("occupationOriginY", occupationOriginY);
-		tag.setBoolean("timedOut", lastTickTimedOut);
+		tag.setString("lastScanMessage", lastScanMessage);
 		
 		if (registeredEndPoint != null)
 		{
@@ -250,7 +250,7 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		unpoweredAspect = Aspect.get(tag.getInteger("unpoweredAspect"));
 		poweredAspect = Aspect.get(tag.getInteger("poweredAspect"));
 		occupationOriginY = tag.getDouble("occupationOriginY");
-		lastTickTimedOut = tag.getBoolean("timedOut");
+		lastScanMessage = tag.getString("lastScanMessage");
 		int[] endPointPos = null;
 		int[] tePos = null;
 		String endPointName = null;
@@ -298,7 +298,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		tag.setInteger("unpoweredAspect", unpoweredAspect.index);
 		tag.setInteger("poweredAspect", poweredAspect.index);
 		tag.setString("name", name);
-		tag.setInteger("occupationAspect", occupationAspect.index);
 		return tag;
 	}
 
@@ -308,7 +307,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		mode = Mode.get(tag.getInteger("mode"));
 		unpoweredAspect = Aspect.get(tag.getInteger("unpoweredAspect"));
 		poweredAspect = Aspect.get(tag.getInteger("poweredAspect"));
-		occupationAspect = Aspect.get(tag.getInteger("occupationAspect"));
 		
 		if (occupationOriginY == -1)
 		{
@@ -317,7 +315,6 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 		
 		if (mode == Mode.Manual)
 		{
-			IBlockState state = world.getBlockState(getPos());
 			registeredEndPoint = null;
 			
 			notifyUpdate();
@@ -411,6 +408,13 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 			world.setBlockState(getPos(), currentState.withProperty(BlockSignalHead.ASPECT, blockAspect));
 			
 			hasUpdatedBlockState = true;
+		}
+		
+		if (getMode() == Mode.Occupation && registeredEndPoint == null && getOccupationAspect() != Aspect.Red)
+		{
+			occupationAspect = Aspect.Red;
+			markDirty();
+			notifyUpdate();
 		}
 		
 		performFlash();
@@ -697,35 +701,17 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 			return NO_PAIR;
 		}
 		
-		if (lastTickTimedOut)
-		{
-			return TIME_OUT;
-		}
-		
-		return OK + " (Pair: " + registeredEndPoint._3() + ")";
+		return lastScanMessage;
 	}
 	
 	public int getSignalStatusColor()
-	{
-		String OKString = OK;
-		
-		if (registeredEndPoint != null)
-		{
-			OKString = OK + " (Pair: " + registeredEndPoint._3() + ")";
-		}
-		
+	{				
 		switch(getSignalStatus())
 		{
-			case TIME_OUT:
 			case NO_ORIGIN:
 				return 0xFF0000;
 			case NO_PAIR:
 				return 0xFFFF00;
-		}
-		
-		if (getSignalStatus().equals(OKString))
-		{
-			return 0x00AA00;
 		}
 		
 		return 0xFFFFFF;
@@ -762,15 +748,13 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 
 	@Override
 	public void onScanComplete(ScanCompleteData scanCompleteData) {
+		lastScanMessage = scanCompleteData.getMessage();
 		if (scanCompleteData.getTimedOut())
 		{
-			lastTickTimedOut = true;
 			occupationAspect = Aspect.Red;
 			markDirty();
 			return;
 		}
-		
-		lastTickTimedOut = false;
 		
 		if (scanCompleteData.getTrainFound())
 		{

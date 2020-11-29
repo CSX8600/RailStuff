@@ -39,7 +39,6 @@ public class GuiSignal extends GuiScreen {
 	ResourceLocation background = new ResourceLocation(ModRailStuff.MODID, "textures/gui/signalBack.png");
 	
 	// Occupation options
-	GuiTextField status;
 	String strStatus;
 	int statusColor;
 	
@@ -95,9 +94,6 @@ public class GuiSignal extends GuiScreen {
 		// Occupation setup
 		int fontWidth = fontRenderer.getStringWidth("Status:");
 		int statusLeft = horizontalCenter - (texWidth / 2) + fontWidth + 20;
-		status = new GuiTextField(ComponentIDs.STATUS, fontRenderer, statusLeft, verticalCenter - 10, texWidth - fontWidth - 40, 20);
-		status.setText(signal.getSignalStatus());
-		status.setTextColor(signal.getSignalStatusColor());
 		
 		updateButtonVisibility();
 		
@@ -163,7 +159,7 @@ public class GuiSignal extends GuiScreen {
 			case Occupation:
 				stringWidth = fontRenderer.getStringWidth("Status:");
 				drawString(fontRenderer, "Status:", horizontalCenter - (texWidth / 2) + 10, verticalCenter - 5, colorWhite);
-				status.drawTextBox();
+				fontRenderer.drawSplitString(signal.getSignalStatus(), horizontalCenter - (texWidth / 2) + 10 + stringWidth + 5, verticalCenter - 5, texWidth - (17 + stringWidth), signal.getSignalStatusColor());
 				break;
 		}
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -183,7 +179,6 @@ public class GuiSignal extends GuiScreen {
 		poweredYellow.visible = false;
 		poweredYellowFlash.visible = false;
 		poweredGreen.visible = false;
-		status.setVisible(false);
 		
 		switch(signal.getMode())
 		{
@@ -200,9 +195,6 @@ public class GuiSignal extends GuiScreen {
 				poweredYellow.visible = true;
 				poweredYellowFlash.visible = true;
 				poweredGreen.visible = true;
-				break;
-			case Occupation:
-				status.setVisible(true);
 				break;
 		}
 	}
