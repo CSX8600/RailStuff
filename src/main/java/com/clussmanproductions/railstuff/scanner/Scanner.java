@@ -251,7 +251,7 @@ public class Scanner
 		if (!moveableRollingStockNearby.isEmpty())
 		{
 			EntityMoveableRollingStock stock = moveableRollingStockNearby.get(0);
-			Vec3d stockVelocity = stock.getVelocity().internal;
+			Vec3d stockVelocity = stock.getVelocity().internal();
 			EnumFacing stockMovementFacing = EnumFacing.getFacingFromVector((float)stockVelocity.x, (float)stockVelocity.y, (float)stockVelocity.z);
 			EnumFacing motionFacing = EnumFacing.getFacingFromVector((float)motion.x, (float)motion.y, (float)motion.z);
 			
