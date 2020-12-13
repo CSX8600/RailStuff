@@ -749,6 +749,8 @@ public class SignalTileEntity extends TileEntitySyncable implements ITickable, I
 	@Override
 	public void onScanComplete(ScanCompleteData scanCompleteData) {
 		lastScanMessage = scanCompleteData.getMessage();
+		notifyUpdate();
+		
 		if (scanCompleteData.getTimedOut())
 		{
 			occupationAspect = Aspect.Red;
