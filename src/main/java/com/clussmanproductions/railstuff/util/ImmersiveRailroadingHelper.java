@@ -3,7 +3,6 @@ package com.clussmanproductions.railstuff.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.clussmanproductions.railstuff.ModRailStuff;
@@ -19,11 +18,13 @@ import com.google.common.collect.ImmutableList;
 import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.entity.EntityRollingStock;
 import cam72cam.immersiverailroading.library.SwitchState;
+import cam72cam.immersiverailroading.library.TrackItems;
+import cam72cam.immersiverailroading.thirdparty.trackapi.ITrack;
 import cam72cam.immersiverailroading.tile.TileRail;
 import cam72cam.immersiverailroading.tile.TileRailBase;
-import cam72cam.immersiverailroading.track.IIterableTrack;
 import cam72cam.mod.block.tile.TileEntity;
 import cam72cam.mod.entity.ModdedEntity;
+import cam72cam.mod.math.Vec3i;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumActionResult;
@@ -33,12 +34,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import trackapi.lib.ITrack;
-import trackapi.lib.Util;
 
 public class ImmersiveRailroadingHelper {
 	public static Vec3d findOrigin(BlockPos currentPos, EnumFacing signalFacing, World world)
 	{
+		cam72cam.mod.world.World camWorld = cam72cam.mod.world.World.get(world);
 		Vec3d retVal = new Vec3d(0, -1, 0);
 		
 		EnumFacing searchDirection = signalFacing.rotateY().rotateY().rotateY();
@@ -46,23 +46,27 @@ public class ImmersiveRailroadingHelper {
 		BlockPos workingPos = new BlockPos(currentPos.getX(), currentPos.getY() - 3, currentPos.getZ());
 		for(int y = 0; y < 6; y++)
 		{
+			boolean doBreak = false;
 			for(int i = 0; i <= 10; i++)
 			{
 				workingPos = workingPos.offset(searchDirection);
 
-				ITrack tile = Util.getTileEntity(world, new Vec3d(workingPos), false);;
+				ITrack tile = ITrack.get(camWorld, new cam72cam.mod.math.Vec3d(workingPos.getX(), workingPos.getY(), workingPos.getZ()), false);
 				if (tile == null)
 				{
 					continue;
 				}
 
-				Vec3d current = new Vec3d(workingPos.getX(), workingPos.getY(), workingPos.getZ());
+				cam72cam.mod.math.Vec3d current = new cam72cam.mod.math.Vec3d(workingPos.getX(), workingPos.getY(), workingPos.getZ());
 
-				Vec3d center = tile.getNextPosition(current, new Vec3d(0, 0, 0));
+				cam72cam.mod.math.Vec3d center = tile.getNextPosition(current, new cam72cam.mod.math.Vec3d(0, 0, 0));
 
 				retVal = new Vec3d(center.x, center.y, center.z);
+				doBreak = true;
 				break;
 			}
+			
+			if (doBreak) { break; }
 			
 			workingPos = new BlockPos(currentPos.getX(), workingPos.getY() + 1, currentPos.getZ());
 		}
@@ -72,8 +76,9 @@ public class ImmersiveRailroadingHelper {
 	
 	public static Vec3d getNextPosition(Vec3d currentPosition, Vec3d motion, World world, SignalTileEntity.LastSwitchInfo lastSwitchInfo)
 	{
+		cam72cam.mod.world.World camWorld = cam72cam.mod.world.World.get(world);
 		BlockPos currentBlockPos = new BlockPos(currentPosition.x, currentPosition.y, currentPosition.z);
-		ITrack te = Util.getTileEntity(world, new Vec3d(currentBlockPos), false);
+		ITrack te = ITrack.get(camWorld, new cam72cam.mod.math.Vec3d(currentPosition), false);
 		
 		int attempt = 0;
 		while(te == null && attempt < 8)
@@ -110,7 +115,7 @@ public class ImmersiveRailroadingHelper {
 					break;
 			}
 
-			te = Util.getTileEntity(world, new Vec3d(currentBlockPos), false);
+			te = ITrack.get(camWorld, new cam72cam.mod.math.Vec3d(currentBlockPos.getX(), currentBlockPos.getY(), currentBlockPos.getZ()), false);
 			attempt++;
 		}
 		
@@ -120,9 +125,9 @@ public class ImmersiveRailroadingHelper {
 		}
 
 
-		if (te instanceof TileEntity && ((TileEntity) te).instance() instanceof TileRailBase) {
+		if (te instanceof TileRailBase) {
 			
-			TileRailBase currentRailBase = (TileRailBase)((TileEntity)te).instance();
+			TileRailBase currentRailBase = (TileRailBase)te;
 			
 			TileRail switchTile;
 			try
@@ -138,41 +143,28 @@ public class ImmersiveRailroadingHelper {
 			if (switchTile != null)
 			{
 				// Skip if we came from facing point - no need to check it since we're moving in the facing-point direction
-				if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(switchTile.info.placementInfo.placementPosition.internal))
+				Vec3d placementPositionMC = new cam72cam.mod.math.Vec3d(switchTile.getPos()).add(switchTile.info.placementInfo.placementPosition).internal();				
+				if (lastSwitchInfo.lastSwitchPlacementPosition == null || !lastSwitchInfo.lastSwitchPlacementPosition.equals(placementPositionMC))
 				{
 					// We're in here because this is either the first time we've encountered a switch
 					// or we encountered a new chained-switch.
 					// First, we need to see if we're at the facing point of the switch
-					if (currentPosition.distanceTo(switchTile.info.placementInfo.placementPosition.internal) <= 0.55)
+					if (currentPosition.distanceTo(placementPositionMC) <= switchTile.info.settings.gauge.value())
 					{
 						// We are at the facing point.  Set last placement info
 						// to indicate we've reached it
-						lastSwitchInfo.lastSwitchPlacementPosition = switchTile.info.placementInfo.placementPosition.internal;
+						lastSwitchInfo.lastSwitchPlacementPosition = placementPositionMC;
 					}
 					else
 					{
 						// We are at the trailing point.  Now we need to see if
 						// the switch is properly lined for our movement.
-						
-						IIterableTrack builder = (IIterableTrack)switchTile.info.getBuilder();
-						
-						boolean isOnStraight = builder.isOnTrack(switchTile.info, new cam72cam.mod.math.Vec3d(currentPosition));
-						
-						Vec3d placementPosition = switchTile.info.placementInfo.placementPosition.internal;
-						ITrack placementITrack = Util.getTileEntity(world, placementPosition, false);
-						
-						if (placementITrack == null || !(placementITrack instanceof TileEntity) || !(((TileEntity)placementITrack).instance() instanceof TileRailBase))
-						{
-							// Can't determine switch state
-							// Assume wrong
-							return currentPosition;
-						}
-						
-						TileRailBase placementRailBase = (TileRailBase)((TileEntity)placementITrack).instance();						
-						TileRail placementTileEntity = placementRailBase.getParentTile();
-						
-						if((placementTileEntity.info.switchState == SwitchState.STRAIGHT && !isOnStraight) ||
-							(placementTileEntity.info.switchState == SwitchState.TURN && isOnStraight))
+						boolean isOnStraight = currentRailBase.getParentTile().info.settings.type != TrackItems.TURN;
+						ITrack placementTrack = ITrack.get(camWorld, new cam72cam.mod.math.Vec3d(placementPositionMC), false);
+						TileRail placementParent = ((TileRailBase)placementTrack).getParentTile();
+												
+						if((placementParent.info.switchState == SwitchState.STRAIGHT && !isOnStraight) ||
+							(placementParent.info.switchState == SwitchState.TURN && isOnStraight))
 						{
 							// This switch is not correctly lined for movement
 							// Stopping here
@@ -182,7 +174,7 @@ public class ImmersiveRailroadingHelper {
 						{
 							// This switch IS correctly lined
 							// Mark this switch okay for next time
-							lastSwitchInfo.lastSwitchPlacementPosition = placementPosition;
+							lastSwitchInfo.lastSwitchPlacementPosition = placementPositionMC;
 						}
 					}
 				}
@@ -193,7 +185,7 @@ public class ImmersiveRailroadingHelper {
 			}
 		}
 		
-		return te.getNextPosition(currentPosition, motion);
+		return te.getNextPosition(new cam72cam.mod.math.Vec3d(currentPosition), new cam72cam.mod.math.Vec3d(motion)).internal();
 	}
 	
 	public static List<EntityMoveableRollingStock> hasStockNearby(Vec3d currentPosition, World world)
@@ -207,7 +199,7 @@ public class ImmersiveRailroadingHelper {
 				.filter(Objects::nonNull)
 				.map(x -> x.getSelf() instanceof EntityMoveableRollingStock ? (EntityMoveableRollingStock)x.getSelf() : null)
 				.filter(Objects::nonNull)
-				.filter(emrs -> bb.contains(new Vec3d(emrs.getBlockPosition().internal)))
+				.filter(emrs -> bb.contains(new Vec3d(emrs.getBlockPosition().internal())))
 				.collect(Collectors.toList());
 
 		return (List<EntityMoveableRollingStock>)stocks;
@@ -299,7 +291,7 @@ public class ImmersiveRailroadingHelper {
 
 	public static EnumActionResult handleSignalCustomOrigin(Supplier<EnumActionResult> setCustomOriginMethod, BlockPos pos, World world)
 	{
-		ITrack trackTE = Util.getTileEntity(world, new Vec3d(pos), false);
+		ITrack trackTE = ITrack.get(cam72cam.mod.world.World.get(world), new cam72cam.mod.math.Vec3d(pos.getX(), pos.getY(), pos.getZ()), false);
 		if (trackTE == null)
 		{
 			return null;
