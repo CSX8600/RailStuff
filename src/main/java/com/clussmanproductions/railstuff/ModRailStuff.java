@@ -22,19 +22,19 @@ public class ModRailStuff
 {
     public static final String MODID = "railstuff";
     public static final String NAME = "RailStuff";
-    public static final String VERSION = "0.2.4";
+    public static final String VERSION = "0.2.6a";
     public static boolean IR_INSTALLED = false;
     public static CreativeTabs CREATIVE_TAB = new CreativeTabs("RailStuff") {
-		
+
 		@Override
 		public ItemStack getTabIconItem() {
 			return new ItemStack(Item.getItemFromBlock(ModBlocks.signal_head), 1, 0);
 		}
 	};
-	
+
 	@Instance
 	public static ModRailStuff instance;
-	
+
 	@SidedProxy(clientSide = "com.clussmanproductions.railstuff.proxy.ClientProxy", serverSide = "com.clussmanproductions.railstuff.proxy.ServerProxy")
 	public static CommonProxy proxy;
 
@@ -52,12 +52,12 @@ public class ModRailStuff
     {
         proxy.init(event);
     }
-    
+
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
     	proxy.postInit(event);
-    	
+
     	IR_INSTALLED = Loader.isModLoaded("immersiverailroading");
     }
 }

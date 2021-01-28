@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.clussmanproductions.railstuff.Config;
+import com.clussmanproductions.railstuff.ModRailStuff;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity.LastSwitchInfo;
 import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 import com.google.common.collect.ImmutableList;
@@ -137,7 +138,7 @@ public class Scanner
 		}
 		catch(Exception ex) // Something went wrong - report it and try again
 		{
-			ex.printStackTrace();
+			ModRailStuff.logger.error(ex);
 		} 
 	}
 	
