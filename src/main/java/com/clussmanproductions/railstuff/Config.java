@@ -11,6 +11,7 @@ public class Config {
 	
 	public static int signalDistanceTimeout = 2000;
 	public static int signalDistanceTick = 10;
+	public static int parallelScans = 1;
 	
 	public static void readConfig()
 	{
@@ -38,5 +39,6 @@ public class Config {
 		cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General configuration");
 		signalDistanceTimeout = cfg.getInt("signalDistanceTimeout", CATEGORY_GENERAL, signalDistanceTimeout, 1, 5000, "How far (in blocks) should signals test for the next signal?");
 		signalDistanceTick = cfg.getInt("signalDistanceTick", CATEGORY_GENERAL, signalDistanceTick, 1, 500, "How far (in blocks) should a signal test for the next signal per tick?");
+		parallelScans = cfg.getInt("parallelScans", CATEGORY_GENERAL, parallelScans, 1, 20, "How many signals should be scanned per tick?  PERFORMANCE NOTE: Total blocks scanned = signalDistanceTick * parallelScans.  The higher this number, the amount of blocks scanned per tick is multiplied.");
 	}
 }
