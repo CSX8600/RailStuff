@@ -54,7 +54,7 @@ public class Scanner
 	
 	public void tick(World world) {
 		try
-		{			
+		{				
 			if (_data.getSubscribers().size() == 0)
 			{
 				for(ScanSession scanSession : scansInProgress)
@@ -183,7 +183,7 @@ public class Scanner
 		}
 		catch(Exception ex) // Something went wrong - report it and try again
 		{
-			ModRailStuff.logger.error(ex);
+			ModRailStuff.logger.error("Error in scanner", ex);
 		} 
 	}
 	
