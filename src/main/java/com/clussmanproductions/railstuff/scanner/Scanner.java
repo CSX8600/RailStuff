@@ -194,7 +194,8 @@ public class Scanner
 		{
 			lastIndex = 0;
 		}
-		
+		HashSet<BlockPos> invalidScanSubscribers = new HashSet<BlockPos>();
+
 		IScannerSubscriber thisScanSubscriber = null;
 		do
 		{
@@ -202,6 +203,14 @@ public class Scanner
 			if (world.isBlockLoaded(subscriberPos, false))
 			{
 				TileEntity te = world.getTileEntity(subscriberPos);
+				
+				if (te == null)
+				{
+					invalidScanSubscribers.add(subscriberPos);
+					lastIndex++;
+					continue;
+				}
+				
 				if (IScannerSubscriber.class.isAssignableFrom(te.getClass()))
 				{
 					thisScanSubscriber = (IScannerSubscriber)te;
@@ -215,6 +224,11 @@ public class Scanner
 						}
 					}
 				}
+			}
+			
+			for(BlockPos invalidSub : invalidScanSubscribers)
+			{
+				_data.removeSubscriber(invalidSub);
 			}
 			
 			if (thisScanSubscriber == null)
