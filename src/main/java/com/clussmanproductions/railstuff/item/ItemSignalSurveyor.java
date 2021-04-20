@@ -183,6 +183,11 @@ public class ItemSignalSurveyor extends Item {
 	{
 		NBTTagCompound tag = getTagOfSurveyor(player);
 		
+		if (!tag.hasKey("occupationpairingpos"))
+		{
+			return EnumActionResult.PASS;
+		}
+		
 		if (tag.hasKey("pairingpos"))
 		{
 			tag.removeTag("pairingpos");
