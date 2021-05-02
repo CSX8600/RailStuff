@@ -53,10 +53,12 @@ public class PacketGetIdentifierForAssignGUI implements IMessage {
 			RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
 			
 			String name = data.getIdentifierByUUID(message.id);
+			boolean overwrite = data.getOverwriteOcTagsByUUID(message.id);
 			
 			PacketSetIdentifierForAssignGUI packet = new PacketSetIdentifierForAssignGUI();
 			packet.id = message.id;
 			packet.name = name;
+			packet.overwrite = overwrite;
 			packet.x = message.x;
 			packet.y = message.y;
 			packet.z = message.z;

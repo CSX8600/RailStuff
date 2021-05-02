@@ -15,17 +15,20 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class PacketSetIdentifierForClient implements IMessage {
 	public UUID id;
 	public String name;
+	public boolean overwrite;
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		NBTTagCompound tag = ByteBufUtils.readTag(buf);
 		id = tag.getUniqueId("id");
 		name = tag.getString("name");
+		overwrite = tag.getBoolean("overwrite");
 	}
 	@Override
 	public void toBytes(ByteBuf buf) {
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setUniqueId("id", id);
 		tag.setString("name", name);
+		tag.setBoolean("overwrite", overwrite);
 		
 		ByteBufUtils.writeTag(buf, tag);
 	}

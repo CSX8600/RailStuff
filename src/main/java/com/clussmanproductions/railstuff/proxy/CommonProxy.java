@@ -15,6 +15,8 @@ import com.clussmanproductions.railstuff.blocks.BlockRedFlag;
 import com.clussmanproductions.railstuff.blocks.BlockSignalHead;
 import com.clussmanproductions.railstuff.blocks.BlockWhistle;
 import com.clussmanproductions.railstuff.blocks.BlockYellowFlag;
+import com.clussmanproductions.railstuff.event.GetTagEventHandler;
+import com.clussmanproductions.railstuff.event.SetTagEventHandler;
 import com.clussmanproductions.railstuff.gui.GuiProxy;
 import com.clussmanproductions.railstuff.item.ItemPaperwork;
 import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
@@ -27,6 +29,7 @@ import com.clussmanproductions.railstuff.tile.TileEntityMilepost;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
@@ -62,7 +65,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.milepost).setRegistryName(ModBlocks.milepost.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.whistle).setRegistryName(ModBlocks.whistle.getRegistryName()));
 	}
-	
+
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> e)
 	{
@@ -74,6 +77,7 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockMast());
 		e.getRegistry().register(new BlockSignalHead());
 		e.getRegistry().register(new BlockEndABS());
+
 		e.getRegistry().register(new BlockMilepost());
 		e.getRegistry().register(new BlockWhistle());
 		
@@ -81,26 +85,32 @@ public class CommonProxy {
 		GameRegistry.registerTileEntity(SignalTileEntity.class, ModRailStuff.MODID + "_signal");
 		GameRegistry.registerTileEntity(TileEntityMilepost.class, ModRailStuff.MODID + "_milepost");
 	}
-	
-	public void preInit(FMLPreInitializationEvent event)
-    {
-        PacketHandler.registerMessages("railstuff");
-        
-        File directory = event.getModConfigurationDirectory();
-        config = new Configuration(new File(directory.getPath(), "railstuff.cfg"));
-        Config.readConfig();
-    }
 
-    public void init(FMLInitializationEvent event)
-    {
-        NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
-    }
-    
-    public void postInit(FMLPostInitializationEvent event)
-    {
-    	if (config.hasChanged())
-    	{
-    		config.save();
-    	}
-    }
+	public void preInit(FMLPreInitializationEvent event)
+	{
+		PacketHandler.registerMessages("railstuff");
+
+		File directory = event.getModConfigurationDirectory();
+		config = new Configuration(new File(directory.getPath(), "railstuff.cfg"));
+		Config.readConfig();
+	}
+
+	public void init(FMLInitializationEvent event)
+	{
+		NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+
+		if (Loader.isModLoaded("immersiverailroading")) {
+			MinecraftForge.EVENT_BUS.register(SetTagEventHandler.class);
+			MinecraftForge.EVENT_BUS.register(GetTagEventHandler.class);
+		}
+
+	}
+
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		if (config.hasChanged())
+		{
+			config.save();
+		}
+	}
 }

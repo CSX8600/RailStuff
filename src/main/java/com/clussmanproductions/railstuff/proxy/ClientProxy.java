@@ -57,6 +57,7 @@ public class ClientProxy extends CommonProxy {
 			GuiAssignRollingStock gui = new GuiAssignRollingStock(message.id);
 			Minecraft.getMinecraft().displayGuiScreen(gui);
 			gui.setText(message.name);
+			gui.setOverwrite(message.overwrite);
 		}
 	}
 	
@@ -64,7 +65,7 @@ public class ClientProxy extends CommonProxy {
 	{
 		World world = Minecraft.getMinecraft().world;
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
-		data.setData(message.values);
+		data.setData(message.values, message.overwrites);
 	}
 	
 	public static void handleSetIdentifierForClient(PacketSetIdentifierForClient message)
@@ -73,6 +74,7 @@ public class ClientProxy extends CommonProxy {
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
 		
 		data.setIdentifierGivenUUID(message.id, message.name);
+		data.setOverwriteOcTagsGivenUUID(message.id, message.overwrite);
 	}
 
 }

@@ -32,7 +32,8 @@ public class PlayerJoinEventHandler {
 		RollingStockIdentificationData data = RollingStockIdentificationData.get(world);
 		
 		PacketSetAllIdentifiersForClient packet = new PacketSetAllIdentifiersForClient();
-		packet.values = data.getData();
+		packet.values = data.getIdentifiers();
+		packet.overwrites = data.getOverwrites();
 		
 		PacketHandler.INSTANCE.sendTo(packet, player);
 	}
