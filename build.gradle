@@ -1,12 +1,19 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+		mavenCentral()
+		maven {
+			name = "forge" 
+			url = "https://maven.minecraftforge.net" 
+		}
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath("com.anatawa12.forge:ForgeGradle:2.3-1.0.+") {
+            changing = true
+        }
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -33,6 +40,11 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories
+{
+	maven { url = "https://cursemaven.com" }
+}
+
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -55,6 +67,9 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+	provided "curse.maven:immersiverailroading-277736:4970105"
+	provided "curse.maven:trackapi-282613:2825260"
+	provided "curse.maven:umc-371784:4975229"
 	compile fileTree(dir:'deps',include:'*.jar')
 }
 
