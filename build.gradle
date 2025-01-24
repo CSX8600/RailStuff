@@ -18,7 +18,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "0.2.6d"
+version = "0.2.6"
 group = "com.clussmanproductions.railstuff" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "railstuff"
 

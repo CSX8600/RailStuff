@@ -22,7 +22,7 @@ public class ModRailStuff
 {
     public static final String MODID = "railstuff";
     public static final String NAME = "RailStuff";
-    public static final String VERSION = "0.2.6d";
+    public static final String VERSION = "0.2.6";
     public static boolean IR_INSTALLED = false;
     public static CreativeTabs CREATIVE_TAB = new CreativeTabs("RailStuff") {
 
@@ -44,6 +44,7 @@ public class ModRailStuff
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        IR_INSTALLED = Loader.isModLoaded("immersiverailroading");
         proxy.preInit(event);
     }
 
@@ -57,7 +58,5 @@ public class ModRailStuff
     public void postInit(FMLPostInitializationEvent event)
     {
     	proxy.postInit(event);
-
-    	IR_INSTALLED = Loader.isModLoaded("immersiverailroading");
     }
 }
