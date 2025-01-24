@@ -11,6 +11,7 @@ import com.clussmanproductions.railstuff.item.ItemRollingStockAssigner;
 import com.clussmanproductions.railstuff.network.PacketGetIdentifierForAssignGUI;
 import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.network.PacketSetIdentifierForAssignGUI;
+import com.clussmanproductions.railstuff.network.PacketSetIdentifierForClient;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
@@ -19,12 +20,12 @@ import cam72cam.immersiverailroading.entity.EntityMoveableRollingStock;
 import cam72cam.immersiverailroading.entity.EntityRollingStock;
 import cam72cam.immersiverailroading.library.SwitchState;
 import cam72cam.immersiverailroading.library.TrackItems;
+import cam72cam.immersiverailroading.thirdparty.event.TagEvent.GetTagEvent;
+import cam72cam.immersiverailroading.thirdparty.event.TagEvent.SetTagEvent;
 import cam72cam.immersiverailroading.thirdparty.trackapi.ITrack;
 import cam72cam.immersiverailroading.tile.TileRail;
 import cam72cam.immersiverailroading.tile.TileRailBase;
-import cam72cam.mod.block.tile.TileEntity;
 import cam72cam.mod.entity.ModdedEntity;
-import cam72cam.mod.math.Vec3i;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumActionResult;
@@ -34,7 +35,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+@EventBusSubscriber
 public class ImmersiveRailroadingHelper {
 	public static Vec3d findOrigin(BlockPos currentPos, EnumFacing signalFacing, World world)
 	{
@@ -298,5 +303,38 @@ public class ImmersiveRailroadingHelper {
 		}
 		
 		return setCustomOriginMethod.get();
+	}
+	
+	@SubscribeEvent
+	public static void IRGetTagEvent(GetTagEvent e)
+	{
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+		{
+			return;
+		}
+		
+		World world = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
+		RollingStockIdentificationData identData = RollingStockIdentificationData.get(world);
+		
+		e.tag = identData.getIdentifierByUUID(e.stockID);
+	}
+	
+	@SubscribeEvent
+	public static void IRSetTagEvent(SetTagEvent e)
+	{
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+		{
+			return;
+		}
+		
+		World world = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
+		RollingStockIdentificationData identData = RollingStockIdentificationData.get(world);
+		
+		identData.setIdentifierGivenUUID(e.stockID, e.tag);
+		
+		PacketSetIdentifierForClient setIdentifierForClient = new PacketSetIdentifierForClient();
+		setIdentifierForClient.id = e.stockID;
+		setIdentifierForClient.name = e.tag;
+		PacketHandler.INSTANCE.sendToAll(setIdentifierForClient);
 	}
 }
