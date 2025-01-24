@@ -23,10 +23,12 @@ import com.clussmanproductions.railstuff.network.PacketHandler;
 import com.clussmanproductions.railstuff.tile.SignalTileEntity;
 import com.clussmanproductions.railstuff.tile.TileEntityManualSwitchStand;
 import com.clussmanproductions.railstuff.tile.TileEntityMilepost;
+import com.clussmanproductions.railstuff.util.ImmersiveRailroadingHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
@@ -94,6 +96,10 @@ public class CommonProxy {
     public void init(FMLInitializationEvent event)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(ModRailStuff.instance, new GuiProxy());
+        if (ModRailStuff.IR_INSTALLED)
+        {
+        	MinecraftForge.EVENT_BUS.register(ImmersiveRailroadingHelper.class);
+        }
     }
     
     public void postInit(FMLPostInitializationEvent event)

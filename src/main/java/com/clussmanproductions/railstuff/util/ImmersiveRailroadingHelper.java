@@ -39,7 +39,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-@EventBusSubscriber
 public class ImmersiveRailroadingHelper {
 	public static Vec3d findOrigin(BlockPos currentPos, EnumFacing signalFacing, World world)
 	{
